@@ -1,0 +1,13 @@
+stateDiagram-v2
+  [*] --> PENDING: POST /orders (trừ kho)
+  PENDING --> PAID: thanh toán thành công\n(cộng điểm thưởng)
+  PENDING --> PAYMENT_FAILED: cổng từ chối
+  PAYMENT_FAILED --> PENDING: thử lại thanh toán
+  PENDING --> CANCELLED: hủy (hoàn kho)
+  PAYMENT_FAILED --> CANCELLED: hủy (hoàn kho)
+  PAID --> PREPARING: nhân viên nhận pha chế
+  PAID --> CANCELLED: hủy (hoàn kho)
+  PREPARING --> READY: pha xong
+  READY --> COMPLETED: khách nhận hàng
+  COMPLETED --> [*]
+  CANCELLED --> [*]

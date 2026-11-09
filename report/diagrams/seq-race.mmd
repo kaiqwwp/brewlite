@@ -1,0 +1,15 @@
+sequenceDiagram
+  autonumber
+  participant A as Khách A (Tx A)
+  participant B as Khách B (Tx B)
+  participant DB as products (id=7, stock=1, version=3)
+  A->>DB: SELECT stock, version → (1, 3)
+  B->>DB: SELECT stock, version → (1, 3)
+  A->>DB: UPDATE SET stock=0, version=4 WHERE id=7 AND version=3
+  DB-->>A: affected = 1 (thành công)
+  B->>DB: UPDATE SET stock=0, version=4 WHERE id=7 AND version=3
+  Note over B,DB: B bị chặn đến khi A COMMIT, sau đó điều kiện version=3 không còn đúng
+  DB-->>B: affected = 0 (xung đột phiên bản)
+  B->>DB: Thử lại: SELECT stock, version → (0, 4)
+  Note over B: stock 0 < qty 1 ⇒ ném 409 OUT_OF_STOCK, ROLLBACK
+  Note over A,B: Kết quả: đúng 1 đơn thành công, tồn kho = 0, không bao giờ âm

@@ -1,0 +1,45 @@
+sequenceDiagram
+  autonumber
+  participant FE as Frontend
+  participant PC as PaymentsController
+  participant PS as PaymentsService
+  participant OS as OrdersService
+  participant GW as MockPaymentGateway
+  participant DB as PostgreSQL
+  FE->>PC: POST /payments + Idempotency-Key + {orderId, method}
+  alt thiếu Idempotency-Key
+    PC-->>FE: 400 Bad Request
+  end
+  PC->>PS: pay(userId, key, dto)
+  PS->>DB: SELECT payment WHERE idempotencyKey
+  alt key đã xử lý
+    PS->>PS: kiểm tra cùng user + cùng orderId
+    PS-->>FE: 200 + Idempotent-Replayed (kết quả lần đầu) / 409 nếu key dùng cho đơn khác
+  else key mới
+    PS->>DB: BEGIN
+    PS->>DB: SELECT order FOR UPDATE (khóa dòng)
+    Note right of DB: Yêu cầu song song cùng đơn phải chờ tại đây
+    PS->>DB: SELECT payment WHERE key (kiểm tra lại sau khi giữ khóa)
+    alt PAYMENT_FAILED
+      PS->>OS: transition → PENDING (thử lại)
+    end
+    alt trạng thái không phải PENDING
+      PS-->>FE: 409 ORDER_NOT_PAYABLE (ROLLBACK)
+    else PENDING
+      PS->>GW: charge(amount, method)
+      alt thành công
+        GW-->>PS: ok + reference
+        PS->>OS: transition → PAID
+        OS->>DB: UPDATE order status, cộng điểm (pointsAwarded false→true)
+        PS->>DB: INSERT payments (SUCCESS, key)
+        PS->>DB: COMMIT
+        PS-->>FE: 201 {success, payment, order: PAID}
+      else bị từ chối
+        GW-->>PS: fail + reason
+        PS->>OS: transition → PAYMENT_FAILED
+        PS->>DB: INSERT payments (FAILED, key) + COMMIT
+        PS-->>FE: 402 {success: false, order: PAYMENT_FAILED}
+        Note over FE: Giữ nguyên giỏ, cho thử lại với key mới
+      end
+    end
+  end

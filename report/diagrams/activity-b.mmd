@@ -1,0 +1,27 @@
+flowchart TD
+  s([Đơn PENDING hoặc PAYMENT_FAILED]) --> k0{POST /payments<br/>có Idempotency-Key?}
+  k0 -- Không --> e0[400 Bad Request]
+  k0 -- Có --> b5{Key đã<br/>xử lý?}
+  b5 -- Có --> b6[Trả kết quả cũ<br/>200 hoặc 402]
+  b5 -- Không --> l2{Khóa dòng đơn: còn<br/>thanh toán được?}
+  l2 -- Không --> e1[409 ORDER_NOT_PAYABLE]
+  l2 -- Có --> g1{Cổng thanh toán<br/>chấp nhận?}
+  g1 -- Có --> b7[PAID, cộng điểm 1 lần<br/>lưu payment SUCCESS]
+  g1 -- Không --> b8[PAYMENT_FAILED<br/>lưu payment FAILED]
+  b7 --> o1[Frontend: xóa giỏ,<br/>màn hình xác nhận]
+  b6 --> o1
+  b8 --> r1{Khách thử lại?}
+  r1 -- Có, key mới --> k0
+  r1 -- Không --> b9[Hủy đơn, hoàn kho]
+  o1 --> stp([Kết thúc])
+  b9 --> stp
+  classDef kh fill:#f6ebdd,stroke:#6f4a2b,color:#2b1a0e
+  classDef fe fill:#e3ecf6,stroke:#4a6fa5,color:#102a43
+  classDef be fill:#e8f0e4,stroke:#5b7f4f,color:#16301a
+  classDef gw fill:#eeeeee,stroke:#777,color:#222
+  classDef err fill:#fde8e8,stroke:#b34a4a,color:#4a1313
+  class s,r1,stp kh
+  class o1 fe
+  class k0,b5,b6,l2,b7,b8,b9 be
+  class g1 gw
+  class e0,e1 err

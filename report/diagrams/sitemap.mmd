@@ -1,0 +1,16 @@
+flowchart TD
+  home["/ — Menu (Task 3)"] -->|chọn món| detail["/products/:id — Chi tiết (Task 4)"]
+  detail -->|Thêm vào giỏ| cart["/cart — Giỏ hàng (Task 5)"]
+  home --> cart
+  cart -->|Thanh toán| guard{Đã đăng nhập?}
+  guard -- Chưa --> login["/login"]
+  login <--> register["/register"]
+  login -->|thành công, next=/checkout| checkout
+  register -->|thành công| checkout
+  guard -- Rồi --> checkout["/checkout — Thanh toán (Task 8)"]
+  checkout -->|PAID| confirm["/orders/:id — Xác nhận (Task 9)"]
+  checkout -->|PAYMENT_FAILED| checkout
+  confirm --> history["/orders — Lịch sử đơn"]
+  home --> history
+  history --> confirm
+  confirm -->|Hủy đơn| history

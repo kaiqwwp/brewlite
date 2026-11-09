@@ -1,0 +1,39 @@
+sequenceDiagram
+  autonumber
+  actor KH as Khách hàng
+  participant FE as Frontend
+  participant OC as OrdersController
+  participant OS as OrdersService
+  participant PR as PromotionsService
+  participant ST as StockService
+  participant DB as PostgreSQL
+  KH->>FE: Bấm "Xác nhận thanh toán"
+  FE->>OC: POST /orders + header Idempotency-Key + {items, couponCode}
+  OC->>OC: JwtAuthGuard + ValidationPipe
+  OC->>OS: create(userId, dto, key)
+  OS->>DB: SELECT order WHERE (userId, key)
+  alt đã có đơn với key này
+    OS-->>OC: replayed = true
+    OC-->>FE: 200 + Idempotent-Replayed (đơn cũ)
+  else key mới
+    OS->>DB: BEGIN
+    OS->>DB: SELECT products WHERE id IN (...)
+    OS->>OS: unitPrice = giá gốc + size + topping (server tự tính)
+    OS->>PR: discountFor(code, subtotal)
+    PR->>DB: SELECT coupon
+    PR-->>OS: số tiền giảm (hoặc 400 nếu mã sai/hết hạn)
+    loop mỗi sản phẩm (sắp theo id)
+      OS->>ST: reserve(productId, qty)
+      ST->>DB: UPDATE products SET stock, version+1 WHERE id AND version = v
+      alt affected = 0 (version đổi)
+        ST->>DB: đọc lại rồi thử lại (tối đa 8 lần)
+      else stock < qty
+        ST-->>OS: 409 OUT_OF_STOCK
+      end
+    end
+    OS->>DB: INSERT orders (PENDING) + order_items
+    OS->>DB: COMMIT
+    OS-->>OC: order
+    OC-->>FE: 201 Created {id, code, status: PENDING, total}
+  end
+  Note over OS,DB: Lỗi giữa chừng ⇒ ROLLBACK, kho không bị trừ

@@ -1,0 +1,16 @@
+digraph D { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname="DejaVu Sans" fontsize=20]; edge [fontname="DejaVu Sans" fontsize=17 color="#6f4a2b"]; rankdir=LR; compound=true; nodesep=0.25; ranksep=0.9; node [shape=box3d style=filled fillcolor="#fffaf0" color="#6f4a2b"];
+ user [label="Máy người dùng\nTrình duyệt (Chrome/Edge)" shape=box style="filled" fillcolor="#eeeeee"];
+ subgraph cluster_host { label="Máy chủ / Docker Host — docker compose up --build"; style="rounded,dashed"; color="#6f4a2b";
+  subgraph cluster_net { label="Mạng nội bộ Docker (bridge)"; style="rounded,filled"; fillcolor="#faf6ef"; color="#bbbbbb";
+   fe [label="«container» frontend\nNode 22 alpine · Next.js (next start)\ncổng 3000\nARG NEXT_PUBLIC_API_URL"];
+   be [label="«container» backend\nNode 22 alpine · NestJS\ncổng 3001\nENV: DATABASE_URL, JWT_SECRET,\nCORS_ORIGIN, DB_SYNC, SEED"];
+   db [label="«container» db\npostgres:16-alpine\ncổng 5432 · healthcheck pg_isready" ];
+   vol [label="«volume»\nbrewlite-db" shape=cylinder fillcolor="#e3ecf6"];
+  }
+ }
+ user -> fe [label="HTTP :3000\n(tải giao diện)"];
+ user -> be [label="HTTP :3001\nREST/JSON + JWT"];
+ be -> db [label="TCP 5432\nTypeORM (pg)"];
+ db -> vol [label="lưu dữ liệu" style=dashed];
+ be -> fe [style=invis];
+}

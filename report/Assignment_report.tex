@@ -86,6 +86,10 @@
 \newcommand{\hl}[1]{\rowcolor{brew!12}#1}
 \usepackage{colortbl}
 
+
+% --- Macro chèn sơ đồ ---
+\newcommand{\dfig}[4][width=\textwidth]{\begin{figure}[htbp]\centering\includegraphics[#1,keepaspectratio,width=\textwidth]{diagrams/#2}\caption{#3}\label{#4}\end{figure}}
+\newcommand{\sfig}[3]{\begin{sidewaysfigure}\centering\includegraphics[width=0.96\textheight,height=0.78\textwidth,keepaspectratio]{diagrams/#1}\caption{#2}\label{#3}\end{sidewaysfigure}}
 \begin{document}
 
 %%%%%%%%%%%%%%%%%%%% TRANG BÌA %%%%%%%%%%%%%%%%%%%%
@@ -163,6 +167,9 @@ Tạo phẩm (Artifacts) & Product Backlog (10 task, Mục~\ref{sec:backlog}); S
 \caption{Vai trò, sự kiện và tạo phẩm Scrum của nhóm}
 \end{table}
 
+Hình~\ref{fig:scrum} mô tả chu trình Scrum áp dụng.
+\begin{figure}[h!]\centering\includegraphics[height=0.42\textheight,keepaspectratio]{diagrams/scrum.pdf}\caption{Chu trình Scrum của dự án}\label{fig:scrum}\end{figure}
+
 \subsection{Kế hoạch 3 Sprint}\label{sec:sprints}
 Mỗi Sprint dài 2 tuần (10 ngày làm việc). Story point (SP) là ước lượng tương đối của nhóm; các task được xếp từ dễ đến khó theo Product Backlog.
 
@@ -178,6 +185,8 @@ Sprint 3 & Thanh toán, bàn giao và nghiệp vụ nâng cao: thanh toán khôn
 \end{tabularx}
 \caption{Kế hoạch 3 Sprint}
 \end{table}
+
+\begin{figure}[h!]\centering\includegraphics[width=\textwidth,keepaspectratio]{diagrams/roadmap.pdf}\caption{Roadmap: phân bổ 10 task vào 3 Sprint}\label{fig:roadmap}\end{figure}
 
 \subsection{Sprint Burndown chart}
 Burndown chart theo dõi khối lượng việc còn lại (story point) giảm dần theo từng ngày. Đường lý tưởng (Ideal) giảm đều; đường thực tế (Actual) phản ánh tiến độ thật. Hình~\ref{fig:burndown} là đường lý tưởng của Sprint 3 (14 SP, 10 ngày); nhóm cập nhật số điểm còn lại vào cuối mỗi ngày vào Bảng~\ref{tab:burndown}.
@@ -313,7 +322,7 @@ US-09 & Là khách hàng, tôi muốn dùng mã giảm giá và tích điểm. &
   \draw[arr,warnred] (x) to[bend right=12] node[above,sloped,pos=.5] {thử lại} (g);
   \draw[arr,dashed] (e.east) -- ++(6mm,0) |- (c.east) node[pos=.25,right] {mua thêm};
 \end{tikzpicture}
-\caption{Luồng nghiệp vụ chính (happy path) và nhánh lỗi của MVP}
+\caption{Luồng nghiệp vụ chính (happy path) và nhánh lỗi của MVP}\label{fig:flow}
 \end{figure}
 
 Luồng chi tiết giữa giao diện và API:
@@ -340,7 +349,7 @@ Luồng chi tiết giữa giao diện và API:
   \draw[arr] (be) -- node[above] {TypeORM} (db);
   \draw[arr] (be) -- node[right] {thanh toán} (pg);
 \end{tikzpicture}
-\caption{Frontend gọi REST API của backend; backend dùng một CSDL và cổng thanh toán giả lập}
+\caption{Frontend gọi REST API của backend; backend dùng một CSDL và cổng thanh toán giả lập}\label{fig:arch}
 \end{figure}
 
 \begin{table}[h!]
@@ -362,28 +371,110 @@ DevOps & Docker Compose (db + backend + frontend), Git, README bàn giao \\ \hli
 Backend chia module theo nghiệp vụ: \texttt{auth} (đăng ký, đăng nhập, guard JWT và phân quyền), \texttt{products}, \texttt{orders} (tạo đơn, state machine, tồn kho), \texttt{payments} (thanh toán idempotent, cổng giả lập), \texttt{promotions} (mã giảm giá, điểm thưởng), \texttt{seed} (dữ liệu mẫu). Các hàm nghiệp vụ thuần (tính giá, tính giảm giá, state machine) được tách riêng để kiểm thử đơn vị.
 
 \subsection{Mô hình dữ liệu}
-\begin{figure}[h!]
-\centering
-\begin{tikzpicture}[every node/.style={font=\scriptsize},
-  ent/.style={draw=brew,fill=brew!6,align=left,inner sep=3pt},
-  rel/.style={thick,brew}]
-  \node[ent] (u) at (0,3.2) {\textbf{users}\\ id (PK)\\ email (unique)\\ name, role\\ passwordHash\\ loyaltyPoints};
-  \node[ent] (o) at (5.6,3.2) {\textbf{orders}\\ id (PK)\\ userId (FK)\\ status\\ subtotal, discount, total\\ couponCode\\ idempotencyKey\\ pointsAwarded, createdAt\\ \textit{unique(userId, idempotencyKey)}};
-  \node[ent] (i) at (11.6,3.2) {\textbf{order\_items}\\ id (PK)\\ orderId (FK)\\ productId (FK)\\ productName, size\\ toppings, qty\\ unitPrice, lineTotal};
-  \node[ent] (p) at (11.6,-0.6) {\textbf{products}\\ id (PK)\\ name, description\\ price, imageUrl\\ stock\\ version (optimistic lock)};
-  \node[ent] (pay) at (5.6,-0.4) {\textbf{payments}\\ id (PK)\\ orderId (FK), userId\\ idempotencyKey (unique)\\ amount, method\\ status, reference};
-  \node[ent] (c) at (0,-0.4) {\textbf{coupons}\\ code (PK)\\ percentOff, minTotal\\ maxDiscount\\ active, expiresAt};
-  \draw[rel] (u) -- node[above] {1} node[below,pos=.9] {N} (o);
-  \draw[rel] (o) -- node[above] {1} node[below,pos=.9] {N} (i);
-  \draw[rel] (p) -- node[right,pos=.1] {1} node[right,pos=.85] {N} (i);
-  \draw[rel] (o) -- node[right,pos=.15] {1} node[right,pos=.85] {N} (pay);
-  \draw[rel,dashed] (c) -- node[above] {tham chiếu theo mã} (o);
-\end{tikzpicture}
-\caption{Mô hình thực thể (mở rộng từ 5 thực thể tối thiểu của đề: thêm \texttt{coupons} và các cột phục vụ Task 10)}
-\end{figure}
+Mô hình dữ liệu gồm 6 bảng (mở rộng từ 5 thực thể tối thiểu của đề: thêm \texttt{coupons} và các cột phục vụ Task 10). Sơ đồ ERD đầy đủ ở Hình~\ref{fig:erd} (Mục~\ref{sec:design}).
 
-%%%%%%%%%%%%%%%%%%%% 7. GIAO DIỆN %%%%%%%%%%%%%%%%%%%%
-\section{Giao diện MVP}
+%%%%%%%%%%%%%%%%%%%% PHÂN TÍCH & THIẾT KẾ (SƠ ĐỒ) %%%%%%%%%%%%%%%%%%%%
+\section{Phân tích và thiết kế hệ thống bằng sơ đồ}\label{sec:design}
+Chương này trình bày toàn bộ bộ sơ đồ phân tích và thiết kế của BrewLite theo ngôn ngữ UML và các sơ đồ dòng dữ liệu. Mọi sơ đồ được vẽ từ mã nguồn văn bản (Mermaid và Graphviz, thư mục \texttt{report/diagrams/}) và đối chiếu trực tiếp với mã nguồn đã cài đặt, nên có thể sinh lại khi mã thay đổi. Bảng~\ref{tab:diagramindex} liệt kê các loại sơ đồ và mục đích của từng loại.
+
+\begin{table}[h!]
+\centering\small
+\begin{tabularx}{\textwidth}{|L{1.0cm}|L{4.0cm}|X|L{1.7cm}|}
+\hline
+\textbf{STT} & \textbf{Loại sơ đồ} & \textbf{Mục đích trong BrewLite} & \textbf{Hình} \\ \hline
+1 & Use Case & Tác nhân, chức năng và quan hệ include/extend của hệ thống & \ref{fig:usecase} \\ \hline
+2 & Dòng dữ liệu (DFD) mức 0 và mức 1 & Dữ liệu vào/ra hệ thống và 6 tiến trình chính & \ref{fig:dfd0}, \ref{fig:dfd1} \\ \hline
+3 & Hoạt động (Activity) & Quy trình từ chọn món đến tạo đơn, và quy trình thanh toán idempotent & \ref{fig:actA}, \ref{fig:actB} \\ \hline
+4 & Tuần tự (Sequence) & 5 kịch bản: xác thực, tạo đơn, thanh toán, hủy/cập nhật trạng thái, tranh chấp tồn kho & \ref{fig:seqauth}--\ref{fig:seqrace} \\ \hline
+5 & Lớp (Class) & Thực thể, dịch vụ, controller, guard và quan hệ phụ thuộc phía backend & \ref{fig:class} \\ \hline
+6 & Thực thể liên kết (ERD) & Lược đồ CSDL PostgreSQL: khóa, ràng buộc UNIQUE, lực lượng quan hệ & \ref{fig:erd} \\ \hline
+7 & Máy trạng thái (State) & Vòng đời đơn hàng và vòng đời xử lý một Idempotency-Key & \ref{fig:stateorder}, \ref{fig:statepay} \\ \hline
+8 & Thành phần (Component) & Thành phần frontend, backend, ORM, CSDL và giao tiếp giữa chúng & \ref{fig:component} \\ \hline
+9 & Gói / Module (Package) & Phụ thuộc giữa các module NestJS & \ref{fig:package} \\ \hline
+10 & Triển khai (Deployment) & 3 container Docker Compose, cổng, volume, biến môi trường & \ref{fig:deployment} \\ \hline
+11 & Điều hướng giao diện (Sitemap/Navigation) & Các trang Next.js, điều kiện chuyển trang và bảo vệ đăng nhập & \ref{fig:sitemap} \\ \hline
+12 & Quy trình Scrum và Roadmap Sprint & Chu trình Scrum và phân bổ 10 task vào 3 Sprint & \ref{fig:scrum}, \ref{fig:roadmap} \\ \hline
+13 & Burndown, Wireframe & Theo dõi tiến độ Sprint 3 (Hình~\ref{fig:burndown}); giao diện MVP (Mục~\ref{sec:ui}) & --- \\ \hline
+\end{tabularx}
+\caption{Danh mục các loại sơ đồ trong báo cáo}\label{tab:diagramindex}
+\end{table}
+
+\subsection{Sơ đồ Use Case}
+Hệ thống có hai tác nhân người dùng là \textbf{Khách hàng} và \textbf{Nhân viên/Barista}, cùng một tác nhân hệ thống là \textbf{Cổng thanh toán} (giả lập). Hình~\ref{fig:usecase} mô tả 13 use case; Bảng~\ref{tab:ucspec} đặc tả hai use case trọng tâm.
+
+\sfig{usecase.pdf}{Sơ đồ Use Case của BrewLite}{fig:usecase}
+
+\begin{table}[h!]
+\centering\small
+\begin{tabularx}{\textwidth}{|L{2.9cm}|X|}
+\hline
+\multicolumn{2}{|l|}{\textbf{UC5 -- Đặt đơn (tạo đơn PENDING)}} \\ \hline
+Tác nhân & Khách hàng \\ \hline
+Tiền điều kiện & Đã đăng nhập (JWT hợp lệ); giỏ hàng có ít nhất 1 dòng. \\ \hline
+Luồng chính & (1) Khách chọn phương thức và (tuỳ chọn) nhập mã giảm giá; (2) frontend gửi \texttt{POST /orders} kèm \texttt{Idempotency-Key}; (3) server kiểm tra dữ liệu, tự tính đơn giá và tiền giảm; (4) trừ kho bằng optimistic locking; (5) lưu đơn \texttt{PENDING} và trả mã đơn. \\ \hline
+Luồng thay thế & 3a. Dữ liệu sai (giỏ rỗng, size/topping không có, số lượng không hợp lệ): 400. 3b. Mã giảm giá sai/hết hạn/chưa đủ giá trị tối thiểu: 400. 4a. Không đủ hàng: 409 \texttt{OUT\_OF\_STOCK}, kho không đổi. 2a. Gửi lại cùng key: trả đơn cũ (200), không tạo đơn mới. \\ \hline
+Hậu điều kiện & Đơn \texttt{PENDING} được lưu; tồn kho đã giảm đúng số lượng; hoặc không có thay đổi nào nếu lỗi (rollback). \\ \hline
+\multicolumn{2}{|l|}{\textbf{UC6 -- Thanh toán không tiền mặt}} \\ \hline
+Tác nhân & Khách hàng; Cổng thanh toán (mock) \\ \hline
+Tiền điều kiện & Đơn của chính khách, ở trạng thái \texttt{PENDING} hoặc \texttt{PAYMENT\_FAILED}. \\ \hline
+Luồng chính & (1) Gửi \texttt{POST /payments} với \texttt{Idempotency-Key}; (2) server khóa dòng đơn; (3) gọi cổng thanh toán; (4) thành công: đơn \texttt{PAID}, cộng điểm thưởng đúng 1 lần, lưu payment \texttt{SUCCESS}; (5) frontend xóa giỏ và mở màn hình xác nhận. \\ \hline
+Luồng thay thế & 1a. Thiếu key: 400. 1b. Key đã xử lý: trả lại kết quả cũ, không trừ tiền lần hai. 1c. Key đã dùng cho đơn khác: 409. 2a. Đơn đã \texttt{PAID}/\texttt{CANCELLED}...: 409 \texttt{ORDER\_NOT\_PAYABLE}. 4a. Cổng từ chối: đơn \texttt{PAYMENT\_FAILED}, trả 402, giữ nguyên giỏ, cho phép thử lại bằng key mới. \\ \hline
+Hậu điều kiện & Mỗi Idempotency-Key tương ứng tối đa 1 giao dịch; trạng thái đơn khớp kết quả thanh toán. \\ \hline
+\end{tabularx}
+\caption{Đặc tả use case UC5 và UC6}\label{tab:ucspec}
+\end{table}
+
+\subsection{Sơ đồ dòng dữ liệu (DFD)}
+DFD mức 0 (Hình~\ref{fig:dfd0}) coi hệ thống là một tiến trình duy nhất và cho thấy các luồng dữ liệu với ba tác nhân ngoài. DFD mức 1 (Hình~\ref{fig:dfd1}) phân rã thành 6 tiến trình và 5 kho dữ liệu tương ứng với các bảng CSDL.
+
+\dfig[width=\textwidth]{dfd0.pdf}{DFD mức 0 (sơ đồ ngữ cảnh)}{fig:dfd0}
+\sfig{dfd1.pdf}{DFD mức 1: phân rã hệ thống thành 6 tiến trình và 5 kho dữ liệu}{fig:dfd1}
+
+\subsection{Sơ đồ hoạt động (Activity)}
+Hình~\ref{fig:actA} mô tả hoạt động của khách hàng và hệ thống từ lúc chọn món đến khi tạo đơn \texttt{PENDING}. Hình~\ref{fig:actB} tiếp nối với quy trình thanh toán idempotent và các nhánh lỗi/thử lại/hủy. Màu sắc: nâu là khách hàng, xanh dương là frontend, xanh lá là backend, xám là cổng thanh toán, đỏ là lỗi.
+
+\dfig[height=0.78\textheight]{activity-a.pdf}{Sơ đồ hoạt động (1): từ chọn món đến tạo đơn}{fig:actA}
+\dfig[height=0.78\textheight]{activity-b.pdf}{Sơ đồ hoạt động (2): thanh toán idempotent, thử lại và hủy đơn}{fig:actB}
+
+\subsection{Sơ đồ tuần tự (Sequence)}
+Năm sơ đồ tuần tự dưới đây bám sát mã nguồn (tên controller, service, câu lệnh SQL chính). Hình~\ref{fig:seqauth} là đăng ký/đăng nhập và xác thực JWT; Hình~\ref{fig:seqorder} là tạo đơn với kiểm tra Idempotency-Key và trừ kho; Hình~\ref{fig:seqpay} là thanh toán idempotent có khóa dòng; Hình~\ref{fig:seqcancel} là hủy đơn (hoàn kho) và nhân viên cập nhật trạng thái; Hình~\ref{fig:seqrace} minh họa cơ chế optimistic locking khi hai khách tranh sản phẩm cuối cùng.
+
+\sfig{seq-auth.pdf}{Sequence: đăng ký, đăng nhập và xác thực JWT}{fig:seqauth}
+\sfig{seq-order.pdf}{Sequence: tạo đơn (validate, tính giá, giảm giá, trừ kho optimistic lock)}{fig:seqorder}
+\sfig{seq-pay.pdf}{Sequence: thanh toán idempotent (khóa dòng đơn, ràng buộc UNIQUE)}{fig:seqpay}
+\sfig{seq-cancel.pdf}{Sequence: khách hủy đơn (hoàn kho) và nhân viên cập nhật trạng thái}{fig:seqcancel}
+\dfig[height=0.62\textheight]{seq-race.pdf}{Sequence: hai khách tranh sản phẩm cuối cùng (optimistic locking)}{fig:seqrace}
+
+\subsection{Sơ đồ lớp (Class)}
+Hình~\ref{fig:class} gồm sáu thực thể (kiểu \texttt{@Entity} của TypeORM), kiểu liệt kê \texttt{OrderStatus}, các service chứa nghiệp vụ, controller và guard. \texttt{Order} và \texttt{OrderItem} có quan hệ hợp thành (composition); \texttt{OrderItem} lưu \texttt{productName} và \texttt{unitPrice} tại thời điểm mua để lịch sử không bị ảnh hưởng khi menu đổi.
+
+\sfig{class.pdf}{Sơ đồ lớp phía backend}{fig:class}
+
+\subsection{Sơ đồ thực thể liên kết (ERD)}
+Hình~\ref{fig:erd} là lược đồ quan hệ trên PostgreSQL. Các ràng buộc quan trọng: \texttt{users.email} UNIQUE; \texttt{payments.idempotencyKey} UNIQUE (nền tảng của thanh toán idempotent); \texttt{(orders.userId, orders.idempotencyKey)} UNIQUE (chống tạo đơn trùng); cột \texttt{products.version} phục vụ optimistic locking.
+
+\dfig[height=0.72\textheight]{erd.pdf}{Sơ đồ ERD (ký hiệu chân chim)}{fig:erd}
+
+\subsection{Sơ đồ máy trạng thái (State Machine)}
+Vòng đời đơn hàng được cài đặt bởi bảng chuyển tiếp trong \texttt{order-status.ts} và được kiểm chứng đủ 49 cặp trạng thái (Mục~\ref{sec:task10}). Hình~\ref{fig:stateorder} là sơ đồ UML tương đương với Hình~\ref{fig:fsm}. Hình~\ref{fig:statepay} mô tả vòng đời xử lý một Idempotency-Key trong \texttt{PaymentsService}.
+
+\dfig[height=0.46\textheight]{state-order.pdf}{State machine của đơn hàng (UML)}{fig:stateorder}
+\dfig[height=0.5\textheight]{state-payment.pdf}{State machine xử lý một Idempotency-Key thanh toán}{fig:statepay}
+
+\subsection{Sơ đồ thành phần, gói và triển khai}
+Sơ đồ thành phần (Hình~\ref{fig:component}) cho thấy frontend chỉ giao tiếp với backend qua REST/JSON kèm JWT, và mọi truy cập CSDL đi qua TypeORM. Sơ đồ gói (Hình~\ref{fig:package}) cho thấy \texttt{payments} phụ thuộc \texttt{orders}, \texttt{orders} phụ thuộc \texttt{promotions}; mọi module dùng chung lớp \texttt{entities}. Sơ đồ triển khai (Hình~\ref{fig:deployment}) khớp với \texttt{docker-compose.yml}.
+
+\sfig{component.pdf}{Sơ đồ thành phần (Component)}{fig:component}
+\dfig[height=0.55\textheight]{package.pdf}{Sơ đồ gói / phụ thuộc module backend}{fig:package}
+\sfig{deployment.pdf}{Sơ đồ triển khai (Deployment) với Docker Compose}{fig:deployment}
+
+\subsection{Sơ đồ điều hướng giao diện}
+Hình~\ref{fig:sitemap} cho thấy các trang của frontend và điều kiện chuyển trang; trang \texttt{/checkout} và \texttt{/orders} yêu cầu đăng nhập (chuyển sang \texttt{/login?next=...} rồi quay lại). Giao diện từng màn hình xem Mục~\ref{sec:ui}.
+
+\dfig[height=0.62\textheight]{sitemap.pdf}{Sơ đồ điều hướng các trang Next.js}{fig:sitemap}
+
+%%%%%%%%%%%%%%%%%%%% GIAO DIỆN %%%%%%%%%%%%%%%%%%%%
+\section{Giao diện MVP}\label{sec:ui}
 Giao diện bám sát 5 màn hình wireframe của đề: (1) Menu, (2) Chi tiết, (3) Giỏ hàng, (4) Thanh toán, (5) Xác nhận; bổ sung màn hình thanh toán lỗi và lịch sử đơn. Ảnh chụp từ bản chạy thật.
 
 \begin{figure}[h!]
@@ -465,7 +556,7 @@ Luồng thành công: \st{PENDING} \ra{} \st{PAID} \ra{} \st{PREPARING} \ra{} \s
   \draw[ko] (pf.east) -- node[above,font=\tiny\sffamily] {hủy} (ca.west);
   \draw[ko] (pa.south) -- node[right,font=\tiny\sffamily,pos=.35] {hủy} (ca.north east);
 \end{tikzpicture}}
-\caption{Sơ đồ máy trạng thái đơn hàng. Đường xanh: luồng thành công; đường đỏ: ngoại lệ}
+\caption{Sơ đồ máy trạng thái đơn hàng. Đường xanh: luồng thành công; đường đỏ: ngoại lệ}\label{fig:fsm}
 \end{figure}
 
 \begin{lstlisting}[caption={Bảng chuyển trạng thái hợp lệ (order-status.ts)}]

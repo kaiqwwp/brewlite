@@ -1,0 +1,19 @@
+digraph C { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname="DejaVu Sans" fontsize=20]; edge [fontname="DejaVu Sans" fontsize=17 color="#6f4a2b"]; rankdir=TB; compound=true; nodesep=0.25; ranksep=0.9; node [shape=component style=filled fillcolor="#fffaf0" color="#6f4a2b"];
+ subgraph cluster_fe { label="Frontend — Next.js 14 (App Router, TypeScript, Tailwind)"; style="rounded,filled"; fillcolor="#f6ebdd"; color="#6f4a2b";
+  p1 [label="Pages\n/ · /products/[id] · /cart\n/login · /register · /checkout\n/orders · /orders/[id]"];
+  c1 [label="Components\nHeader · AuthForm · ui.tsx\nuseRequireAuth"];
+  s1 [label="Zustand store (persist)\ncart · token · user"];
+  a1 [label="lib/api.ts\nfetch + JWT + Idempotency-Key"];
+  p1 -> c1; p1 -> s1; p1 -> a1; c1 -> s1; }
+ subgraph cluster_be { label="Backend — NestJS (REST)"; style="rounded,filled"; fillcolor="#e8f0e4"; color="#5b7f4f";
+  g1 [label="Guards & Pipes\nJwtAuthGuard · RolesGuard\nValidationPipe"];
+  m1 [label="AuthModule"]; m2 [label="ProductsModule"]; m3 [label="OrdersModule\nOrdersService · StockService\nPromotionsService · order-status"]; m4 [label="PaymentsModule\nPaymentsService"]; m5 [label="UsersModule"]; m6 [label="SeedService"];
+  gw [label="MockPaymentGateway" fillcolor="#eeeeee"];
+  g1 -> m1 [style=invis];
+  m1 -> m5; m4 -> m3; m4 -> gw;
+ }
+ subgraph cluster_db { label="Database"; style="rounded,filled"; fillcolor="#e3ecf6"; color="#4a6fa5";
+  db [label="PostgreSQL 16\nusers · products · orders\norder_items · payments · coupons" shape=cylinder fillcolor="#ffffff"]; orm [label="TypeORM\n(transaction, optimistic lock,\npessimistic lock)" shape=component]; orm -> db; }
+ a1 -> g1 [label="HTTP/JSON (REST)\nAuthorization: Bearer" lhead=cluster_be];
+ m3 -> orm [ltail=cluster_be label="SQL qua TypeORM"];
+}

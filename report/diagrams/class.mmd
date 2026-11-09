@@ -1,0 +1,126 @@
+classDiagram
+  direction LR
+  class User {
+    +int id
+    +string email
+    +string name
+    -string passwordHash
+    +CUSTOMER|STAFF role
+    +int loyaltyPoints
+    +Date createdAt
+  }
+  class Product {
+    +int id
+    +string name
+    +string description
+    +int price
+    +string imageUrl
+    +int stock
+    +int version
+  }
+  class Order {
+    +int id
+    +int userId
+    +OrderStatus status
+    +int subtotal
+    +int discount
+    +int total
+    +string couponCode
+    +string idempotencyKey
+    +bool pointsAwarded
+    +Date createdAt
+  }
+  class OrderItem {
+    +int id
+    +int productId
+    +string productName
+    +string size
+    +string[] toppings
+    +int qty
+    +int unitPrice
+    +int lineTotal
+  }
+  class Payment {
+    +int id
+    +string idempotencyKey
+    +int amount
+    +WALLET|CARD method
+    +SUCCESS|FAILED status
+    +string reference
+    +string failureReason
+  }
+  class Coupon {
+    +string code
+    +int percentOff
+    +int minTotal
+    +int maxDiscount
+    +bool active
+    +Date expiresAt
+  }
+  class OrderStatus {
+    <<enumeration>>
+    PENDING
+    PAID
+    PREPARING
+    READY
+    COMPLETED
+    PAYMENT_FAILED
+    CANCELLED
+  }
+  class AuthService {
+    +register(dto)
+    +login(dto)
+  }
+  class ProductsService {
+    +findAll()
+    +findOne(id)
+  }
+  class OrdersService {
+    +create(userId, dto, key)
+    +transition(m, order, to)
+    +cancel(id, user)
+    +staffUpdate(id, to)
+    +history(userId)
+    +findOne(id, user)
+  }
+  class StockService {
+    +reserve(m, wanted)
+    +release(m, wanted)
+  }
+  class PromotionsService {
+    +discountFor(m, code, subtotal)
+    +awardPoints(m, order)
+  }
+  class PaymentsService {
+    +pay(userId, key, dto)
+  }
+  class MockPaymentGateway {
+    +charge(req) ChargeResult
+  }
+  class AuthController
+  class ProductsController
+  class OrdersController
+  class PaymentsController
+  class JwtAuthGuard
+  class RolesGuard
+  User "1" --> "0..*" Order : đặt
+  Order "1" *-- "1..*" OrderItem : gồm
+  Order "1" --> "0..*" Payment : được thanh toán bởi
+  Order ..> OrderStatus : status
+  OrderItem "0..*" --> "1" Product : tham chiếu
+  Order "0..*" ..> "0..1" Coupon : áp mã
+  AuthController --> AuthService
+  ProductsController --> ProductsService
+  OrdersController --> OrdersService
+  PaymentsController --> PaymentsService
+  OrdersController ..> JwtAuthGuard
+  OrdersController ..> RolesGuard
+  PaymentsController ..> JwtAuthGuard
+  OrdersService --> StockService
+  OrdersService --> PromotionsService
+  PaymentsService --> OrdersService
+  PaymentsService --> MockPaymentGateway
+  StockService ..> Product
+  PromotionsService ..> Coupon
+  PromotionsService ..> User
+  ProductsService ..> Product

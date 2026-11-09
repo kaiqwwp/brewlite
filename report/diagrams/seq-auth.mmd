@@ -1,0 +1,31 @@
+sequenceDiagram
+  autonumber
+  actor KH as Khách hàng
+  participant FE as Frontend (Next.js)
+  participant AC as AuthController
+  participant AS as AuthService
+  participant DB as PostgreSQL
+  KH->>FE: Nhập email + mật khẩu (Đăng ký)
+  FE->>AC: POST /auth/register {email, password, name}
+  AC->>AC: ValidationPipe (IsEmail, MinLength 6, whitelist)
+  alt dữ liệu sai
+    AC-->>FE: 400 Bad Request
+  else hợp lệ
+    AC->>AS: register(dto)
+    AS->>DB: SELECT user WHERE email
+    alt email đã tồn tại
+      AS-->>FE: 409 Conflict
+    else email mới
+      AS->>AS: bcrypt.hash(password, 10)
+      AS->>DB: INSERT users (role = CUSTOMER)
+      AS->>AS: jwt.sign({sub, email, role})
+      AS-->>FE: 201 {accessToken, user}
+      FE->>FE: Lưu token vào Zustand (persist)
+    end
+  end
+  Note over KH,DB: Đăng nhập tương tự: so khớp bcrypt.compare, sai → 401 Unauthorized
+  KH->>FE: Truy cập trang cần đăng nhập
+  FE->>AC: GET /auth/me (Authorization: Bearer token)
+  AC->>AC: JwtAuthGuard → JwtStrategy.validate
+  AC->>DB: SELECT user by sub (đọc lại role)
+  AC-->>FE: 200 {id, email, name, role, loyaltyPoints}

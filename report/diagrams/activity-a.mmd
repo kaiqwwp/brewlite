@@ -1,0 +1,27 @@
+flowchart TD
+  s([Bắt đầu]) --> a1[Xem menu, chọn món<br/>size, topping, số lượng<br/>rồi Thêm vào giỏ]
+  a1 --> a4{Chọn thêm<br/>món?}
+  a4 -- Có --> a1
+  a4 -- Không --> a5[Mở giỏ hàng,<br/>bấm Thanh toán]
+  a5 --> a6{Đã đăng<br/>nhập?}
+  a6 -- Chưa --> a7[Đăng nhập /<br/>Đăng ký]
+  a7 --> a8
+  a6 -- Rồi --> a8[Chọn phương thức,<br/>nhập mã giảm giá]
+  a8 --> f2[Frontend: POST /orders<br/>+ Idempotency-Key]
+  f2 --> b1{Dữ liệu<br/>hợp lệ?}
+  b1 -- Không --> e1[400: hiển thị lỗi]
+  b1 -- Có --> b2[Server tính giá,<br/>áp mã giảm]
+  b2 --> b3{Đủ tồn kho?<br/>optimistic lock}
+  b3 -- Không --> e2[409 OUT_OF_STOCK]
+  b3 -- Có --> b4[Trừ kho, lưu đơn<br/>PENDING, COMMIT]
+  b4 --> nx([Sang bước thanh toán])
+  e1 -.-> a8
+  e2 -.-> a1
+  classDef kh fill:#f6ebdd,stroke:#6f4a2b,color:#2b1a0e
+  classDef fe fill:#e3ecf6,stroke:#4a6fa5,color:#102a43
+  classDef be fill:#e8f0e4,stroke:#5b7f4f,color:#16301a
+  classDef err fill:#fde8e8,stroke:#b34a4a,color:#4a1313
+  class s,a1,a4,a5,a6,a7,a8 kh
+  class f2 fe
+  class b1,b2,b3,b4,nx be
+  class e1,e2 err

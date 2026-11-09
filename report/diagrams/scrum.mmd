@@ -1,0 +1,9 @@
+flowchart TD
+  pb[("Product Backlog\n10 task, ưu tiên bởi PO")] --> sp["Sprint Planning\nchọn task vào Sprint"]
+  sp --> sb[("Sprint Backlog")]
+  sb --> dev["Sprint 2 tuần\nDaily Scrum 15 phút"]
+  dev --> inc["Increment\nchạy được, đạt DoD"]
+  inc --> rv["Sprint Review\ndemo cho khách hàng"]
+  rv --> rt["Sprint Retrospective\ncải tiến quy trình"]
+  rt -.->|Sprint kế tiếp| sp
+  rv -.->|phản hồi, cập nhật| pb

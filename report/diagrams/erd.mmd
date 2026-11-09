@@ -1,0 +1,68 @@
+erDiagram
+  USERS ||--o{ ORDERS : "đặt"
+  ORDERS ||--|{ ORDER_ITEMS : "gồm"
+  PRODUCTS ||--o{ ORDER_ITEMS : "được bán trong"
+  ORDERS ||--o{ PAYMENTS : "được thanh toán"
+  USERS ||--o{ PAYMENTS : "thực hiện"
+  COUPONS |o--o{ ORDERS : "áp dụng (couponCode)"
+  USERS {
+    int id PK
+    varchar email UK
+    varchar name
+    varchar passwordHash
+    varchar role "CUSTOMER | STAFF"
+    int loyaltyPoints
+    timestamptz createdAt
+  }
+  PRODUCTS {
+    int id PK
+    varchar name
+    varchar description
+    int price "VND, size M"
+    varchar imageUrl
+    int stock
+    int version "optimistic lock"
+  }
+  ORDERS {
+    int id PK
+    int userId FK
+    varchar status
+    int subtotal
+    int discount
+    int total
+    varchar couponCode
+    varchar idempotencyKey "UNIQUE cùng userId"
+    boolean pointsAwarded
+    timestamptz createdAt
+  }
+  ORDER_ITEMS {
+    int id PK
+    int orderId FK
+    int productId FK
+    varchar productName
+    varchar size
+    text toppings
+    int qty
+    int unitPrice
+    int lineTotal
+  }
+  PAYMENTS {
+    int id PK
+    int orderId FK
+    int userId FK
+    varchar idempotencyKey UK
+    int amount
+    varchar method
+    varchar status
+    varchar reference
+    varchar failureReason
+    timestamptz createdAt
+  }
+  COUPONS {
+    varchar code PK
+    int percentOff
+    int minTotal
+    int maxDiscount
+    boolean active
+    timestamptz expiresAt
+  }

@@ -1,0 +1,15 @@
+stateDiagram-v2
+  [*] --> KeyMoi: nhận Idempotency-Key
+  KeyMoi: Key chưa tồn tại
+  KeyMoi --> DangXuLy: khóa dòng đơn (FOR UPDATE)
+  DangXuLy: Đang xử lý (trong transaction)
+  DangXuLy --> SUCCESS: cổng chấp nhận
+  DangXuLy --> FAILED: cổng từ chối
+  DangXuLy --> TuChoi: đơn không ở PENDING / PAYMENT_FAILED
+  TuChoi: 409 ORDER_NOT_PAYABLE (không lưu payment)
+  SUCCESS --> DaLuu: INSERT payments (UNIQUE key)
+  FAILED --> DaLuu: INSERT payments (UNIQUE key)
+  DaLuu: Key đã gắn với kết quả
+  DaLuu --> DaLuu: gửi lại cùng key ⇒ trả kết quả cũ (200/402), không tính tiền lại
+  DaLuu --> [*]
+  TuChoi --> [*]

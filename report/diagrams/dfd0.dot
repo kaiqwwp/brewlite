@@ -1,0 +1,11 @@
+digraph DFD0 { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname="DejaVu Sans" fontsize=20]; edge [fontname="DejaVu Sans" fontsize=17 color="#6f4a2b"]; rankdir=TB; nodesep=0.25; ranksep=0.9;
+ node [shape=box style=filled fillcolor="#eeeeee" color="#555555"];
+ KH [label="Khách hàng"]; NV [label="Nhân viên"]; GW [label="Cổng thanh toán\n(mock)"];
+ sys [label="0\nHệ thống đặt cà phê\nBrewLite" shape=circle style=filled fillcolor="#f6ebdd" color="#6f4a2b" width=2.2];
+ KH -> sys [label="đăng ký/đăng nhập, giỏ hàng,\nyêu cầu đặt đơn, yêu cầu thanh toán,\nhủy đơn"];
+ sys -> KH [label="menu, token, mã đơn,\nkết quả thanh toán, lịch sử đơn,\nđiểm thưởng"];
+ NV -> sys [label="cập nhật trạng thái đơn"];
+ sys -> NV [label="đơn cần pha chế"];
+ sys -> GW [label="yêu cầu trừ tiền\n(amount, method)"];
+ GW -> sys [label="kết quả (ok/fail, reference)"];
+}
