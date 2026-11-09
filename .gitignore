@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.next/
+.env
+*.log
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# LaTeX
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.xdv
+report/*.fls
+report/*.fdb_latexmk
