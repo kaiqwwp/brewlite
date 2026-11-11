@@ -1,10 +1,10 @@
 sequenceDiagram
   autonumber
   actor KH as Khách hàng
-  actor NV as Nhân viên (STAFF)
-  participant OC as OrdersController
-  participant OS as OrdersService
-  participant ST as StockService
+  actor NV as Nhân viên<br/>(STAFF)
+  participant OC as Orders<br/>Controller
+  participant OS as Orders<br/>Service
+  participant ST as Stock<br/>Service
   participant DB as PostgreSQL
   rect rgb(246,235,221)
   Note over KH,DB: A. Khách hủy đơn

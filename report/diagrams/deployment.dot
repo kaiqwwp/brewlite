@@ -1,4 +1,4 @@
-digraph D { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname="DejaVu Sans" fontsize=20]; edge [fontname="DejaVu Sans" fontsize=17 color="#6f4a2b"]; rankdir=LR; compound=true; nodesep=0.25; ranksep=0.9; node [shape=box3d style=filled fillcolor="#fffaf0" color="#6f4a2b"];
+digraph D { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname="DejaVu Sans" fontsize=20]; edge [fontname="DejaVu Sans" fontsize=17 color="#6f4a2b"]; rankdir=TB; compound=true; nodesep=0.25; ranksep=0.7; node [shape=box3d style=filled fillcolor="#fffaf0" color="#6f4a2b"];
  user [label="Máy người dùng\nTrình duyệt (Chrome/Edge)" shape=box style="filled" fillcolor="#eeeeee"];
  subgraph cluster_host { label="Máy chủ / Docker Host — docker compose up --build"; style="rounded,dashed"; color="#6f4a2b";
   subgraph cluster_net { label="Mạng nội bộ Docker (bridge)"; style="rounded,filled"; fillcolor="#faf6ef"; color="#bbbbbb";

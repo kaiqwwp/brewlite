@@ -1,10 +1,10 @@
 sequenceDiagram
   autonumber
   participant FE as Frontend
-  participant PC as PaymentsController
-  participant PS as PaymentsService
-  participant OS as OrdersService
-  participant GW as MockPaymentGateway
+  participant PC as Payments<br/>Controller
+  participant PS as Payments<br/>Service
+  participant OS as Orders<br/>Service
+  participant GW as Mock<br/>Gateway
   participant DB as PostgreSQL
   FE->>PC: POST /payments + Idempotency-Key + {orderId, method}
   alt thiếu Idempotency-Key

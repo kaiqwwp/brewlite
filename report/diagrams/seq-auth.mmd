@@ -1,9 +1,9 @@
 sequenceDiagram
   autonumber
   actor KH as Khách hàng
-  participant FE as Frontend (Next.js)
-  participant AC as AuthController
-  participant AS as AuthService
+  participant FE as Frontend<br/>(Next.js)
+  participant AC as Auth<br/>Controller
+  participant AS as Auth<br/>Service
   participant DB as PostgreSQL
   KH->>FE: Nhập email + mật khẩu (Đăng ký)
   FE->>AC: POST /auth/register {email, password, name}

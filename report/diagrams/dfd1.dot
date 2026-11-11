@@ -1,10 +1,13 @@
-digraph DFD1 { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname="DejaVu Sans" fontsize=20]; edge [fontname="DejaVu Sans" fontsize=17 color="#6f4a2b"]; rankdir=LR; nodesep=0.25; ranksep=0.9;
+digraph DFD1 { graph [fontname="DejaVu Sans" fontsize=30 pad=0.2]; node [fontname="DejaVu Sans" fontsize=30]; edge [fontname="DejaVu Sans" fontsize=26 color="#6f4a2b"]; rankdir=LR; nodesep=0.35; ranksep=0.35; newrank=true;
  node [shape=box style=filled fillcolor="#eeeeee" color="#555555"];
  KH [label="Khách hàng"]; NV [label="Nhân viên"]; GW [label="Cổng thanh toán\n(mock)"];
  node [shape=ellipse style=filled fillcolor="#f6ebdd" color="#6f4a2b"];
  p1 [label="1.0\nXác thực\nngười dùng"]; p2 [label="2.0\nTra cứu\nmenu"]; p3 [label="3.0\nTạo đơn\n(tính giá, giảm giá,\ntrừ kho)"]; p4 [label="4.0\nThanh toán\n(idempotent)"]; p5 [label="5.0\nQuản lý trạng thái\nđơn (state machine)"]; p6 [label="6.0\nTruy vấn\nlịch sử"];
  node [shape=cds style=filled fillcolor="#e3ecf6" color="#4a6fa5"];
  d1 [label="D1 users"]; d2 [label="D2 products"]; d3 [label="D3 orders +\norder_items"]; d4 [label="D4 payments"]; d5 [label="D5 coupons"];
+ {rank=min; KH; NV; GW}
+ {rank=same; p1;p2;p3;p4;p5;p6}
+ {rank=max; d1;d2;d3;d4;d5}
  KH -> p1 [label="email, mật khẩu"]; p1 -> KH [label="JWT"]; p1 -> d1 [dir=both];
  KH -> p2 [label="xem menu"]; p2 -> KH [label="danh sách, chi tiết"]; d2 -> p2;
  KH -> p3 [label="giỏ hàng, mã giảm"]; p3 -> KH [label="đơn PENDING"]; d2 -> p3 [dir=both label="tồn kho/version"]; d5 -> p3; p3 -> d3;

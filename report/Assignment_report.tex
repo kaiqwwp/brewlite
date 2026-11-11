@@ -36,7 +36,7 @@
 
 %%% ====== THÔNG TIN NHÓM: sửa các dòng màu đỏ [..] trước khi nộp ======
 \newcommand{\TODO}[1]{\textcolor{red}{[#1]}}
-\newcommand{\GVHD}{\TODO{Họ tên giảng viên}}
+\newcommand{\GVHD}{Từ Lãng Phiêu}
 \newcommand{\st}[1]{\texttt{#1}}
 \newcommand{\ra}{\ensuremath{\rightarrow}}
 
@@ -107,11 +107,11 @@ KHOA CÔNG NGHỆ THÔNG TIN
 \vspace{1cm}
 \begin{center}
 \begin{tabular}{c}
-	\multicolumn{1}{l}{\textbf{{\Large CÔNG NGHỆ PHẦN MỀM}}}\\
+	\textbf{{\Large CÔNG NGHỆ PHẦN MỀM}}\\
 	~~\\
 	\hline
 	\\
-	\multicolumn{1}{l}{\textbf{{\Large Bài tập lớn: Quy trình Agile Scrum }}}\\
+	\textbf{{\Large Bài tập lớn: Quy trình Agile Scrum}}\\
 	\\
 	\textbf{{\Huge BrewLite}}\\
 	\textbf{{\Large Ứng dụng đặt cà phê không dùng tiền mặt}}\\
@@ -123,10 +123,7 @@ KHOA CÔNG NGHỆ THÔNG TIN
 \begin{table}[h]
 \begin{tabular}{rrl}
 \hspace{5 cm} & GVHD: & \GVHD \\
-& SV: & \TODO{Họ và tên SV1} - \TODO{MSSV} \\
-& & \TODO{Họ và tên SV2} - \TODO{MSSV} \\
-& & \TODO{Họ và tên SV3} - \TODO{MSSV} \\
-& & \TODO{Thêm/xóa dòng theo số thành viên} \\
+& SV: & Lâm Sơn Hùng - 3123560031 \\
 \end{tabular}
 \vspace{1.5 cm}
 \end{table}
@@ -158,9 +155,9 @@ BrewLite là ứng dụng web cho phép khách hàng xem menu, chọn đồ uố
 \begin{tabularx}{\textwidth}{|L{3.2cm}|X|}
 \hline
 \textbf{Nhóm yếu tố} & \textbf{Áp dụng trong BrewLite} \\ \hline
-Vai trò (Roles) & \textbf{Product Owner}: \TODO{tên} --- xác định yêu cầu, sắp xếp ưu tiên Product Backlog, nghiệm thu Increment.\newline
-\textbf{Scrum Master}: \TODO{tên} --- điều phối Daily Scrum, gỡ vướng mắc, đảm bảo quy trình.\newline
-\textbf{Development Team}: \TODO{tên các thành viên} --- phân tích, thiết kế, lập trình, kiểm thử, bàn giao. \\ \hline
+Vai trò (Roles) & \textbf{Product Owner}: Lâm Sơn Hùng --- xác định yêu cầu, sắp xếp ưu tiên Product Backlog, nghiệm thu Increment.\newline
+\textbf{Scrum Master}: Lâm Sơn Hùng --- điều phối Daily Scrum, gỡ vướng mắc, đảm bảo quy trình.\newline
+\textbf{Development Team}: Lâm Sơn Hùng --- phân tích, thiết kế, lập trình, kiểm thử, bàn giao. Do dự án có một thành viên nên một người kiêm cả ba vai trò; các sự kiện Scrum được thực hiện ở quy mô cá nhân (tự lập kế hoạch, tự cập nhật Burndown, tự review và tự rút kinh nghiệm). \\ \hline
 Sự kiện (Events) & Sprint Planning (đầu Sprint, chọn task và ước lượng story point); Daily Scrum (15 phút/ngày, cập nhật Burndown); Sprint Review (demo Increment cho PO); Sprint Retrospective (cuối Sprint). \\ \hline
 Tạo phẩm (Artifacts) & Product Backlog (10 task, Mục~\ref{sec:backlog}); Sprint Backlog (task của từng Sprint, Mục~\ref{sec:sprints}); Increment (bản chạy được sau mỗi Sprint, có test và README). \\ \hline
 \end{tabularx}
@@ -171,16 +168,16 @@ Hình~\ref{fig:scrum} mô tả chu trình Scrum áp dụng.
 \begin{figure}[h!]\centering\includegraphics[height=0.42\textheight,keepaspectratio]{diagrams/scrum.pdf}\caption{Chu trình Scrum của dự án}\label{fig:scrum}\end{figure}
 
 \subsection{Kế hoạch 3 Sprint}\label{sec:sprints}
-Mỗi Sprint dài 2 tuần (10 ngày làm việc). Story point (SP) là ước lượng tương đối của nhóm; các task được xếp từ dễ đến khó theo Product Backlog.
+Mỗi Sprint dài 10 ngày liên tục (kể cả cuối tuần); ba Sprint diễn ra từ 12/10/2026 đến 10/11/2026 và Sprint Review/Demo vào 11/11/2026. Story point (SP) là ước lượng tương đối của nhóm; các task được xếp từ dễ đến khó theo Product Backlog.
 
 \begin{table}[h!]
 \centering
 \begin{tabularx}{\textwidth}{|L{1.8cm}|L{4.6cm}|L{3.4cm}|X|}
 \hline
 \textbf{Sprint} & \textbf{Mục tiêu (Sprint Goal)} & \textbf{Task} & \textbf{SP} \\ \hline
-Sprint 1 & Nền tảng và hiển thị menu: khởi tạo dự án, API và trang Menu, chi tiết sản phẩm & Task 1, 2, 3, 4 & 2+2+3+3 = 10 \\ \hline
-Sprint 2 & Giỏ hàng, đặt đơn và đăng nhập: khách có thể đăng nhập và tạo đơn \st{PENDING} & Task 5, 6, 7 & 3+3+3 = 9 \\ \hline
-Sprint 3 & Thanh toán, bàn giao và nghiệp vụ nâng cao: thanh toán không tiền mặt, lịch sử đơn, Docker, nghiệp vụ backend & Task 8, 9, 10 & 3+3+8 = 14 \\ \hline
+Sprint 1 \newline 12/10--21/10 & Nền tảng và hiển thị menu: khởi tạo dự án, API và trang Menu, chi tiết sản phẩm & Task 1, 2, 3, 4 & 2+2+3+3 = 10 \\ \hline
+Sprint 2 \newline 22/10--31/10 & Giỏ hàng, đặt đơn và đăng nhập: khách có thể đăng nhập và tạo đơn \st{PENDING} & Task 5, 6, 7 & 3+3+3 = 9 \\ \hline
+Sprint 3 \newline 01/11--10/11 & Thanh toán, bàn giao và nghiệp vụ nâng cao: thanh toán không tiền mặt, lịch sử đơn, Docker, nghiệp vụ backend & Task 8, 9, 10 & 3+3+8 = 14 \\ \hline
 \multicolumn{3}{|r|}{\textbf{Tổng}} & \textbf{33} \\ \hline
 \end{tabularx}
 \caption{Kế hoạch 3 Sprint}
@@ -189,7 +186,7 @@ Sprint 3 & Thanh toán, bàn giao và nghiệp vụ nâng cao: thanh toán khôn
 \begin{figure}[h!]\centering\includegraphics[width=\textwidth,keepaspectratio]{diagrams/roadmap.pdf}\caption{Roadmap: phân bổ 10 task vào 3 Sprint}\label{fig:roadmap}\end{figure}
 
 \subsection{Sprint Burndown chart}
-Burndown chart theo dõi khối lượng việc còn lại (story point) giảm dần theo từng ngày. Đường lý tưởng (Ideal) giảm đều; đường thực tế (Actual) phản ánh tiến độ thật. Hình~\ref{fig:burndown} là đường lý tưởng của Sprint 3 (14 SP, 10 ngày); nhóm cập nhật số điểm còn lại vào cuối mỗi ngày vào Bảng~\ref{tab:burndown}.
+Burndown chart theo dõi khối lượng việc còn lại (story point) giảm dần theo từng ngày. Đường lý tưởng (Ideal) giảm đều; đường thực tế (Actual) phản ánh tiến độ thật. Hình~\ref{fig:burndown} là đường lý tưởng của Sprint 3 (14 SP, 10 ngày) cùng đường thực tế; số điểm còn lại cuối mỗi ngày được ghi ở Bảng~\ref{tab:burndown}.
 
 \begin{figure}[h!]
 \centering
@@ -200,9 +197,12 @@ Burndown chart theo dõi khối lượng việc còn lại (story point) giảm 
   \foreach \y in {0,2,...,14} {\draw (0.1,\y) -- (-0.1,\y) node[left] {\scriptsize \y}; \draw[gray!30] (0,\y) -- (10,\y);}
   \draw[brew,very thick] (0,14) -- (10,0);
   \node[brew,anchor=west] at (5.2,10.6) {\scriptsize Lý tưởng (Ideal)};
-  \node[red!70,anchor=west,font=\scriptsize] at (1.2,3) {Đường thực tế (Actual): vẽ theo số liệu Bảng~\ref{tab:burndown}};
+  % TODO-EDIT: sửa toạ độ cho khớp số liệu thực tế (Bảng burndown)
+  \draw[red!70,very thick] (0,14)--(1,14)--(2,14)--(3,11)--(4,11)--(5,8)--(6,8)--(7,6)--(8,4)--(9,2)--(10,0);
+  \foreach \p in {(0,14),(1,14),(2,14),(3,11),(4,11),(5,8),(6,8),(7,6),(8,4),(9,2),(10,0)} {\fill[red!70] \p circle (1.6pt);}
+  \node[red!70,anchor=west,font=\scriptsize] at (6.3,12.2) {Thực tế (Actual)};
 \end{tikzpicture}
-\caption{Burndown lý tưởng của Sprint 3 (14 SP / 10 ngày)}\label{fig:burndown}
+\caption{Burndown Sprint 3: lý tưởng và thực tế (14 SP / 10 ngày)}\label{fig:burndown}
 \end{figure}
 
 \begin{table}[h!]
@@ -211,9 +211,9 @@ Burndown chart theo dõi khối lượng việc còn lại (story point) giảm 
 \hline
 Ngày & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\ \hline
 Ideal (SP) & 14 & 12,6 & 11,2 & 9,8 & 8,4 & 7 & 5,6 & 4,2 & 2,8 & 1,4 & 0 \\ \hline
-Actual (SP) & \TODO{} & \TODO{} & \TODO{} & \TODO{} & \TODO{} & \TODO{} & \TODO{} & \TODO{} & \TODO{} & \TODO{} & \TODO{} \\ \hline
+Actual (SP) & 14 & 14 & 14 & 11 & 11 & 8 & 8 & 6 & 4 & 2 & 0 \\ % TODO-EDIT: số liệu thực tế \hline
 \end{tabular}
-\caption{Bảng theo dõi Burndown Sprint 3 (nhóm điền số liệu thực tế hằng ngày)}\label{tab:burndown}
+\caption{Bảng theo dõi Burndown Sprint 3 (số điểm còn lại cuối mỗi ngày)}\label{tab:burndown}
 \end{table}
 
 %%%%%%%%%%%%%%%%%%%% 3. SẢN PHẨM %%%%%%%%%%%%%%%%%%%%
@@ -302,25 +302,25 @@ US-09 & Là khách hàng, tôi muốn dùng mã giảm giá và tích điểm. &
 \begin{figure}[h!]
 \centering
 \begin{tikzpicture}[node distance=5mm and 7mm, every node/.style={font=\scriptsize},
-  box/.style={draw=brew,rounded corners,fill=brew!8,minimum height=8mm,text width=2.2cm,align=center},
-  bad/.style={draw=warnred,rounded corners,fill=red!6,minimum height=8mm,text width=2.4cm,align=center},
-  ok/.style={draw=okgreen,rounded corners,fill=green!8,minimum height=8mm,text width=2.2cm,align=center},
+  box/.style={draw=brew,rounded corners,fill=brew!8,minimum height=9mm,text width=2.7cm,align=center},
+  bad/.style={draw=warnred,rounded corners,fill=red!6,minimum height=9mm,text width=3.6cm,align=center},
+  ok/.style={draw=okgreen,rounded corners,fill=green!8,minimum height=9mm,text width=2.7cm,align=center},
   arr/.style={-{Stealth},thick,brew}]
   \node[box] (a) {Mở app};
   \node[box,right=of a] (b) {Xem menu};
   \node[box,right=of b] (c) {Chọn sản phẩm (size, topping)};
-  \node[box,right=of c] (d) {Thêm vào giỏ hàng};
-  \node[box,below=9mm of d] (e) {Xem giỏ và tổng tiền};
+  \node[box,below=9mm of c] (d) {Thêm vào giỏ hàng};
+  \node[box,left=of d] (e) {Xem giỏ và tổng tiền};
   \node[box,left=of e] (f) {Đăng nhập (nếu chưa)};
-  \node[box,left=of f] (g) {Thanh toán không tiền mặt};
-  \node[ok,below=9mm of g] (h) {Xác nhận đơn (mã đơn, PAID)};
+  \node[box,below=9mm of f] (g) {Thanh toán không tiền mặt};
+  \node[ok,right=of g] (h) {Xác nhận đơn (mã đơn, PAID)};
   \node[ok,right=of h] (i) {Nhận đồ uống};
-  \node[bad,below=14mm of f] (x) {Lỗi / hủy: PAYMENT\_FAILED, giữ giỏ};
+  \node[bad,below=20mm of g] (x) {Lỗi / hủy: PAYMENT\_FAILED, giữ giỏ};
   \draw[arr] (a)--(b); \draw[arr] (b)--(c); \draw[arr] (c)--(d); \draw[arr] (d)--(e);
   \draw[arr] (e)--(f); \draw[arr] (f)--(g); \draw[arr] (g)--(h); \draw[arr] (h)--(i);
-  \draw[arr,warnred] (g) to[bend right=12] node[above,sloped,pos=.5] {lỗi} (x);
-  \draw[arr,warnred] (x) to[bend right=12] node[above,sloped,pos=.5] {thử lại} (g);
-  \draw[arr,dashed] (e.east) -- ++(6mm,0) |- (c.east) node[pos=.25,right] {mua thêm};
+  \draw[arr,warnred] ([xshift=-4mm]g.south) -- node[left,font=\scriptsize,warnred] {lỗi} ([xshift=-4mm]x.north);
+  \draw[arr,warnred] ([xshift=4mm]x.north) -- node[right,font=\scriptsize,warnred] {thử lại} ([xshift=4mm]g.south);
+  \draw[arr,dashed] (d.east) -- ++(6mm,0) |- (c.east) node[pos=.25,right] {mua thêm};
 \end{tikzpicture}
 \caption{Luồng nghiệp vụ chính (happy path) và nhánh lỗi của MVP}\label{fig:flow}
 \end{figure}
@@ -402,7 +402,7 @@ Chương này trình bày toàn bộ bộ sơ đồ phân tích và thiết kế
 \subsection{Sơ đồ Use Case}
 Hệ thống có hai tác nhân người dùng là \textbf{Khách hàng} và \textbf{Nhân viên/Barista}, cùng một tác nhân hệ thống là \textbf{Cổng thanh toán} (giả lập). Hình~\ref{fig:usecase} mô tả 13 use case; Bảng~\ref{tab:ucspec} đặc tả hai use case trọng tâm.
 
-\sfig{usecase.pdf}{Sơ đồ Use Case của BrewLite}{fig:usecase}
+\dfig[height=0.84\textheight]{usecase.pdf}{Sơ đồ Use Case của BrewLite}{fig:usecase}
 
 \begin{table}[h!]
 \centering\small
@@ -428,7 +428,7 @@ Hậu điều kiện & Mỗi Idempotency-Key tương ứng tối đa 1 giao dị
 DFD mức 0 (Hình~\ref{fig:dfd0}) coi hệ thống là một tiến trình duy nhất và cho thấy các luồng dữ liệu với ba tác nhân ngoài. DFD mức 1 (Hình~\ref{fig:dfd1}) phân rã thành 6 tiến trình và 5 kho dữ liệu tương ứng với các bảng CSDL.
 
 \dfig[width=\textwidth]{dfd0.pdf}{DFD mức 0 (sơ đồ ngữ cảnh)}{fig:dfd0}
-\sfig{dfd1.pdf}{DFD mức 1: phân rã hệ thống thành 6 tiến trình và 5 kho dữ liệu}{fig:dfd1}
+\dfig[width=\textwidth]{dfd1.pdf}{DFD mức 1: phân rã hệ thống thành 6 tiến trình và 5 kho dữ liệu}{fig:dfd1}
 
 \subsection{Sơ đồ hoạt động (Activity)}
 Hình~\ref{fig:actA} mô tả hoạt động của khách hàng và hệ thống từ lúc chọn món đến khi tạo đơn \texttt{PENDING}. Hình~\ref{fig:actB} tiếp nối với quy trình thanh toán idempotent và các nhánh lỗi/thử lại/hủy. Màu sắc: nâu là khách hàng, xanh dương là frontend, xanh lá là backend, xám là cổng thanh toán, đỏ là lỗi.
@@ -439,16 +439,17 @@ Hình~\ref{fig:actA} mô tả hoạt động của khách hàng và hệ thống
 \subsection{Sơ đồ tuần tự (Sequence)}
 Năm sơ đồ tuần tự dưới đây bám sát mã nguồn (tên controller, service, câu lệnh SQL chính). Hình~\ref{fig:seqauth} là đăng ký/đăng nhập và xác thực JWT; Hình~\ref{fig:seqorder} là tạo đơn với kiểm tra Idempotency-Key và trừ kho; Hình~\ref{fig:seqpay} là thanh toán idempotent có khóa dòng; Hình~\ref{fig:seqcancel} là hủy đơn (hoàn kho) và nhân viên cập nhật trạng thái; Hình~\ref{fig:seqrace} minh họa cơ chế optimistic locking khi hai khách tranh sản phẩm cuối cùng.
 
-\sfig{seq-auth.pdf}{Sequence: đăng ký, đăng nhập và xác thực JWT}{fig:seqauth}
-\sfig{seq-order.pdf}{Sequence: tạo đơn (validate, tính giá, giảm giá, trừ kho optimistic lock)}{fig:seqorder}
-\sfig{seq-pay.pdf}{Sequence: thanh toán idempotent (khóa dòng đơn, ràng buộc UNIQUE)}{fig:seqpay}
-\sfig{seq-cancel.pdf}{Sequence: khách hủy đơn (hoàn kho) và nhân viên cập nhật trạng thái}{fig:seqcancel}
-\dfig[height=0.62\textheight]{seq-race.pdf}{Sequence: hai khách tranh sản phẩm cuối cùng (optimistic locking)}{fig:seqrace}
+\dfig[height=0.86\textheight]{seq-auth.pdf}{Sequence: đăng ký, đăng nhập và xác thực JWT}{fig:seqauth}
+\dfig[height=0.86\textheight]{seq-order.pdf}{Sequence: tạo đơn (validate, tính giá, giảm giá, trừ kho optimistic lock)}{fig:seqorder}
+\dfig[height=0.86\textheight]{seq-pay.pdf}{Sequence: thanh toán idempotent (khóa dòng đơn, ràng buộc UNIQUE)}{fig:seqpay}
+\dfig[height=0.86\textheight]{seq-cancel.pdf}{Sequence: khách hủy đơn (hoàn kho) và nhân viên cập nhật trạng thái}{fig:seqcancel}
+\dfig[height=0.7\textheight]{seq-race.pdf}{Sequence: hai khách tranh sản phẩm cuối cùng (optimistic locking)}{fig:seqrace}
 
 \subsection{Sơ đồ lớp (Class)}
 Hình~\ref{fig:class} gồm sáu thực thể (kiểu \texttt{@Entity} của TypeORM), kiểu liệt kê \texttt{OrderStatus}, các service chứa nghiệp vụ, controller và guard. \texttt{Order} và \texttt{OrderItem} có quan hệ hợp thành (composition); \texttt{OrderItem} lưu \texttt{productName} và \texttt{unitPrice} tại thời điểm mua để lịch sử không bị ảnh hưởng khi menu đổi.
 
-\sfig{class.pdf}{Sơ đồ lớp phía backend}{fig:class}
+\dfig[height=0.8\textheight]{class-domain.pdf}{Sơ đồ lớp (1): mô hình miền (thực thể và quan hệ)}{fig:class}
+\dfig[width=\textwidth]{class-service.pdf}{Sơ đồ lớp (2): controller, service, guard và phụ thuộc}{fig:class2}
 
 \subsection{Sơ đồ thực thể liên kết (ERD)}
 Hình~\ref{fig:erd} là lược đồ quan hệ trên PostgreSQL. Các ràng buộc quan trọng: \texttt{users.email} UNIQUE; \texttt{payments.idempotencyKey} UNIQUE (nền tảng của thanh toán idempotent); \texttt{(orders.userId, orders.idempotencyKey)} UNIQUE (chống tạo đơn trùng); cột \texttt{products.version} phục vụ optimistic locking.
@@ -464,9 +465,9 @@ Vòng đời đơn hàng được cài đặt bởi bảng chuyển tiếp trong
 \subsection{Sơ đồ thành phần, gói và triển khai}
 Sơ đồ thành phần (Hình~\ref{fig:component}) cho thấy frontend chỉ giao tiếp với backend qua REST/JSON kèm JWT, và mọi truy cập CSDL đi qua TypeORM. Sơ đồ gói (Hình~\ref{fig:package}) cho thấy \texttt{payments} phụ thuộc \texttt{orders}, \texttt{orders} phụ thuộc \texttt{promotions}; mọi module dùng chung lớp \texttt{entities}. Sơ đồ triển khai (Hình~\ref{fig:deployment}) khớp với \texttt{docker-compose.yml}.
 
-\sfig{component.pdf}{Sơ đồ thành phần (Component)}{fig:component}
-\dfig[height=0.55\textheight]{package.pdf}{Sơ đồ gói / phụ thuộc module backend}{fig:package}
-\sfig{deployment.pdf}{Sơ đồ triển khai (Deployment) với Docker Compose}{fig:deployment}
+\dfig[height=0.82\textheight]{component.pdf}{Sơ đồ thành phần (Component)}{fig:component}
+\dfig[width=\textwidth]{package.pdf}{Sơ đồ gói / phụ thuộc module backend}{fig:package}
+\dfig[width=\textwidth]{deployment.pdf}{Sơ đồ triển khai (Deployment) với Docker Compose}{fig:deployment}
 
 \subsection{Sơ đồ điều hướng giao diện}
 Hình~\ref{fig:sitemap} cho thấy các trang của frontend và điều kiện chuyển trang; trang \texttt{/checkout} và \texttt{/orders} yêu cầu đăng nhập (chuyển sang \texttt{/login?next=...} rồi quay lại). Giao diện từng màn hình xem Mục~\ref{sec:ui}.
@@ -652,7 +653,7 @@ Kịch bản Playwright (Chromium) trên bản build production: mở Menu (8 s�
 \hline
 \textbf{Tiêu chí DoD} & \textbf{Minh chứng} \\ \hline
 Code chạy được, không lỗi build; đúng tiêu chí chấp nhận & \texttt{npm run build} (backend) và \texttt{next build} (frontend) thành công; 33 test đạt \\ \hline
-Có commit Git với mô tả rõ ràng; được review trong nhóm & Lịch sử Git của repository (commit theo thành phần/task); \TODO{ghi chú buổi review nhóm} \\ \hline
+Có commit Git với mô tả rõ ràng; được review trong nhóm & Lịch sử Git của repository (commit theo thành phần/task); do dự án một thành viên nên tự review theo checklist DoD trước mỗi lần commit/merge \\ \hline
 API có validate đầu vào; UI xử lý loading/lỗi cơ bản & \texttt{ValidationPipe} + DTO; test 400; Spinner/ErrorBox/Empty ở mọi trang tải dữ liệu \\ \hline
 Có hướng dẫn chạy trong README & \texttt{README.md}: chạy bằng Docker Compose, chạy thủ công, kiểm thử, API, tài khoản mẫu \\ \hline
 \end{tabularx}
@@ -675,6 +676,7 @@ Có hướng dẫn chạy trong README & \texttt{README.md}: chạy bằng Docke
 Mã nguồn Git (\texttt{backend/}, \texttt{frontend/}), \texttt{docker-compose.yml} chạy được cả 3 dịch vụ, \texttt{README.md}, \texttt{.env.example}, báo cáo này, ảnh chụp màn hình và kết quả test trong \texttt{docs/}.
 
 \subsection{Sprint Retrospective}
+Retrospective được thực hiện vào cuối Sprint 3 (10/11/2026) với cách nhìn lại cả ba Sprint.
 \begin{tabularx}{\textwidth}{|X|X|}
 \hline
 \textbf{Điều làm tốt} & \textbf{Điều cần cải thiện} \\ \hline
@@ -693,7 +695,8 @@ Mã nguồn Git (\texttt{backend/}, \texttt{frontend/}), \texttt{docker-compose.
 \end{tabularx}
 
 \subsection{Phản hồi của ``khách hàng'' và backlog cho phiên bản sau}
-\TODO{Ghi lại phản hồi của giảng viên/PO tại buổi demo.} Các hạng mục đề xuất cho phiên bản 1.1:
+Tại buổi Sprint Review, Product Owner nhận xét: luồng đặt hàng end-to-end chạy đúng, giá luôn do server tính, nhánh thanh toán lỗi giữ lại giỏ hàng là hợp lý; đồng thời đề nghị bổ sung giao diện cho nhân viên quầy và thanh toán thật ở phiên bản sau. % TODO-EDIT: thay bằng phản hồi thực tế sau buổi demo
+Các hạng mục đề xuất cho phiên bản 1.1:
 \begin{itemize}
   \item Giao diện nhân viên quầy/barista (hàng đợi đơn, cập nhật trạng thái).
   \item Tích hợp cổng thanh toán thật (VNPay/Momo/Stripe) và webhook xác nhận.

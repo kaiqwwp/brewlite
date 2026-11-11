@@ -1,14 +1,14 @@
-flowchart LR
+flowchart TB
   subgraph S1["Sprint 1 · 10 SP"]
-    direction TB
-    t1["Task 1 (2 SP)\nKhởi tạo dự án"] --> t2["Task 2 (2 SP)\nAPI sản phẩm"] --> t3["Task 3 (3 SP)\nTrang Menu"] --> t4["Task 4 (3 SP)\nChi tiết, size, topping"]
+    direction LR
+    t1["Task 1 (2 SP)<br/>Khởi tạo dự án"] --> t2["Task 2 (2 SP)<br/>API sản phẩm"] --> t3["Task 3 (3 SP)<br/>Trang Menu"] --> t4["Task 4 (3 SP)<br/>Chi tiết, size, topping"]
   end
   subgraph S2["Sprint 2 · 9 SP"]
-    direction TB
-    t5["Task 5 (3 SP)\nGiỏ hàng"] --> t6["Task 6 (3 SP)\nAPI tạo đơn PENDING"] --> t7["Task 7 (3 SP)\nĐăng nhập JWT"]
+    direction LR
+    t5["Task 5 (3 SP)<br/>Giỏ hàng"] --> t6["Task 6 (3 SP)<br/>API tạo đơn PENDING"] --> t7["Task 7 (3 SP)<br/>Đăng nhập JWT"]
   end
   subgraph S3["Sprint 3 · 14 SP"]
-    direction TB
-    t8["Task 8 (3 SP)\nThanh toán mock"] --> t9["Task 9 (3 SP)\nXác nhận, lịch sử, Docker"] --> t10["Task 10 (8 SP)\nState machine, idempotent,\ntồn kho, khuyến mãi"]
+    direction LR
+    t8["Task 8 (3 SP)<br/>Thanh toán mock"] --> t9["Task 9 (3 SP)<br/>Xác nhận, lịch sử, Docker"] --> t10["Task 10 (8 SP)<br/>State machine, idempotent,<br/>tồn kho, khuyến mãi"]
   end
   S1 -->|Review + Retro| S2 -->|Review + Retro| S3 -->|Demo cho khách hàng| done(["Increment cuối"])

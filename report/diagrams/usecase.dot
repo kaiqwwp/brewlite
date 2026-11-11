@@ -1,7 +1,7 @@
-digraph UC { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname="DejaVu Sans" fontsize=20]; edge [fontname="DejaVu Sans" fontsize=17 color="#6f4a2b"]; rankdir=LR; splines=polyline; nodesep=0.25; ranksep=0.9; newrank=true;
+digraph UC { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname="DejaVu Sans" fontsize=20]; edge [fontname="DejaVu Sans" fontsize=17 color="#6f4a2b"]; rankdir=LR; splines=true; nodesep=0.3; ranksep=0.25; newrank=true;
  node [shape=box style="filled" fillcolor="#e8f0e4" color="#5b7f4f"];
  KH [label="Khách hàng\n«actor»" shape=box style="rounded,filled" fillcolor="#f6ebdd" color="#6f4a2b"];
- NV [label="Nhân viên / Barista\n«actor»" shape=box style="rounded,filled" fillcolor="#f6ebdd" color="#6f4a2b"];
+ NV [label="Nhân viên\n«actor»" shape=box style="rounded,filled" fillcolor="#f6ebdd" color="#6f4a2b"];
  GW [label="Cổng thanh toán\n(Mock Momo/VNPay)\n«actor hệ thống»" shape=box style="rounded,filled" fillcolor="#eeeeee" color="#777777"];
  subgraph cluster_sys { label="Hệ thống BrewLite"; style="rounded,dashed"; color="#6f4a2b"; labeljust=l;
   node [shape=ellipse style=filled fillcolor="#fffaf0" color="#6f4a2b"];
@@ -9,18 +9,19 @@ digraph UC { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname=
   uc4 [label="UC4 Đăng ký /\nĐăng nhập"]; uc5 [label="UC5 Đặt đơn\n(tạo đơn PENDING)"]; uc6 [label="UC6 Thanh toán\nkhông tiền mặt"];
   uc7 [label="UC7 Xem xác nhận đơn"]; uc8 [label="UC8 Xem lịch sử đơn"]; uc9 [label="UC9 Hủy đơn"];
   uc10 [label="UC10 Áp mã giảm giá"]; uc11 [label="UC11 Tích điểm thưởng"]; uc12 [label="UC12 Thử lại thanh toán"];
-  uc13 [label="UC13 Cập nhật trạng thái\npha chế (PREPARING/READY/COMPLETED)"];
+  uc13 [label="UC13 Cập nhật trạng thái\npha chế (PREPARING,\nREADY, COMPLETED)"];
+  {rank=same; uc1; uc2; uc3; uc4; uc5; uc10; uc6; uc12; uc11; uc7; uc8; uc9; uc13}
  }
- {rank=source; KH; NV}
- {rank=sink; GW}
+ {rank=min; KH; NV}
+ {rank=max; GW}
  KH -> {uc1 uc3 uc4 uc5 uc6 uc7 uc8 uc9} [arrowhead=none];
  NV -> {uc13} [arrowhead=none];
  NV -> uc4 [arrowhead=none constraint=false];
  uc6 -> GW [arrowhead=none];
- uc2 -> uc1 [style=dashed label="«extend»" arrowhead=open];
- uc5 -> uc4 [style=dashed label="«include»" arrowhead=open];
- uc6 -> uc5 [style=dashed label="«include»" arrowhead=open];
- uc10 -> uc5 [style=dashed label="«extend»" arrowhead=open];
- uc11 -> uc6 [style=dashed label="«extend»\n(khi PAID)" arrowhead=open];
- uc12 -> uc6 [style=dashed label="«extend»\n(PAYMENT_FAILED)" arrowhead=open];
+ uc2 -> uc1 [style=dashed label="«extend»" arrowhead=open constraint=false];
+ uc5 -> uc4 [style=dashed label="«include»" arrowhead=open constraint=false];
+ uc6 -> uc5 [style=dashed label="«include»" arrowhead=open constraint=false];
+ uc10 -> uc5 [style=dashed label="«extend»" arrowhead=open constraint=false];
+ uc11 -> uc6 [style=dashed label="«extend»\n(khi PAID)" arrowhead=open constraint=false];
+ uc12 -> uc6 [style=dashed label="«extend»\n(PAYMENT_FAILED)" arrowhead=open constraint=false];
 }

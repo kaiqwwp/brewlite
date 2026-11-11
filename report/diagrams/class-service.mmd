@@ -1,0 +1,56 @@
+classDiagram
+  direction TB
+  class AuthController
+  class ProductsController
+  class OrdersController
+  class PaymentsController
+  class JwtAuthGuard
+  class RolesGuard
+  class AuthService {
+    +register(dto)
+    +login(dto)
+  }
+  class ProductsService {
+    +findAll()
+    +findOne(id)
+  }
+  class OrdersService {
+    +create(userId, dto, key)
+    +transition(m, order, to)
+    +cancel(id, user)
+    +staffUpdate(id, to)
+    +history(userId)
+    +findOne(id, user)
+  }
+  class PaymentsService {
+    +pay(userId, key, dto)
+  }
+  class StockService {
+    +reserve(m, wanted)
+    +release(m, wanted)
+  }
+  class PromotionsService {
+    +discountFor(m, code, subtotal)
+    +awardPoints(m, order)
+  }
+  class MockPaymentGateway {
+    +charge(req) ChargeResult
+  }
+  AuthController --> AuthService
+  ProductsController --> ProductsService
+  OrdersController --> OrdersService
+  PaymentsController --> PaymentsService
+  OrdersController ..> JwtAuthGuard
+  OrdersController ..> RolesGuard
+  PaymentsController ..> JwtAuthGuard
+  OrdersService --> StockService
+  OrdersService --> PromotionsService
+  PaymentsService --> OrdersService
+  PaymentsService --> MockPaymentGateway
+  StockService ..> Product
+  PromotionsService ..> Coupon
+  PromotionsService ..> User
+  ProductsService ..> Product
+  class Product
+  class Coupon
+  class User

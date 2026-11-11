@@ -1,0 +1,75 @@
+classDiagram
+  direction TB
+  class User {
+    +int id
+    +string email
+    +string name
+    -string passwordHash
+    +CUSTOMER|STAFF role
+    +int loyaltyPoints
+    +Date createdAt
+  }
+  class Order {
+    +int id
+    +int userId
+    +OrderStatus status
+    +int subtotal
+    +int discount
+    +int total
+    +string couponCode
+    +string idempotencyKey
+    +bool pointsAwarded
+    +Date createdAt
+  }
+  class OrderItem {
+    +int id
+    +int productId
+    +string productName
+    +string size
+    +string[] toppings
+    +int qty
+    +int unitPrice
+    +int lineTotal
+  }
+  class Product {
+    +int id
+    +string name
+    +string description
+    +int price
+    +string imageUrl
+    +int stock
+    +int version
+  }
+  class Payment {
+    +int id
+    +string idempotencyKey
+    +int amount
+    +WALLET|CARD method
+    +SUCCESS|FAILED status
+    +string reference
+    +string failureReason
+  }
+  class Coupon {
+    +string code
+    +int percentOff
+    +int minTotal
+    +int maxDiscount
+    +bool active
+    +Date expiresAt
+  }
+  class OrderStatus {
+    <<enumeration>>
+    PENDING
+    PAID
+    PREPARING
+    READY
+    COMPLETED
+    PAYMENT_FAILED
+    CANCELLED
+  }
+  User "1" --> "0..*" Order : đặt
+  Order "1" *-- "1..*" OrderItem : gồm
+  Order "1" --> "0..*" Payment : được thanh toán bởi
+  Order ..> OrderStatus : status
+  OrderItem "0..*" --> "1" Product : tham chiếu
+  Order "0..*" ..> "0..1" Coupon : áp mã

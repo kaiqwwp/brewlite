@@ -1,0 +1,36 @@
+flowchart TB
+  subgraph FE["Frontend: Next.js 14 (App Router, TypeScript, Tailwind)"]
+    direction TB
+    P1["Pages<br/>/ · /products/[id] · /cart<br/>/login · /register · /checkout<br/>/orders · /orders/[id]"]
+    C1["Components<br/>Header · AuthForm · ui.tsx"]
+    S1["Zustand store (persist)<br/>cart · token · user"]
+    A1["lib/api.ts<br/>fetch + JWT + Idempotency-Key"]
+    P1 --> C1
+    P1 --> S1
+    P1 --> A1
+  end
+  subgraph BE["Backend: NestJS (REST)"]
+    direction TB
+    G1["Guards và Pipes<br/>JwtAuthGuard · RolesGuard<br/>ValidationPipe"]
+    M1["AuthModule"] --> M5["UsersModule"]
+    M2["ProductsModule"]
+    M3["OrdersModule<br/>OrdersService · StockService<br/>PromotionsService · order-status"]
+    M4["PaymentsModule<br/>PaymentsService"] --> M3
+    M4 --> GW["MockPaymentGateway"]
+    M6["SeedService"]
+    G1 --> M1
+    G1 --> M2
+    G1 --> M3
+    G1 --> M4
+  end
+  subgraph DB["Database"]
+    direction TB
+    ORM["TypeORM<br/>transaction · optimistic lock<br/>pessimistic lock"] --> PG[("PostgreSQL 16<br/>users · products · orders<br/>order_items · payments · coupons")]
+  end
+  A1 -->|"HTTP/JSON (REST)<br/>Authorization: Bearer"| G1
+  M3 -->|"SQL qua TypeORM"| ORM
+  classDef g fill:#eeeeee,stroke:#777777;
+  class GW g;
+  style FE fill:#f6ebdd,stroke:#6f4a2b
+  style BE fill:#e8f0e4,stroke:#5b7f4f
+  style DB fill:#e3ecf6,stroke:#4a6fa5

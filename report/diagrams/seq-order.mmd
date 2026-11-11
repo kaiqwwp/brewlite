@@ -2,10 +2,10 @@ sequenceDiagram
   autonumber
   actor KH as Khách hàng
   participant FE as Frontend
-  participant OC as OrdersController
-  participant OS as OrdersService
-  participant PR as PromotionsService
-  participant ST as StockService
+  participant OC as Orders<br/>Controller
+  participant OS as Orders<br/>Service
+  participant PR as Promotions<br/>Service
+  participant ST as Stock<br/>Service
   participant DB as PostgreSQL
   KH->>FE: Bấm "Xác nhận thanh toán"
   FE->>OC: POST /orders + header Idempotency-Key + {items, couponCode}

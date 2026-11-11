@@ -3,7 +3,8 @@ digraph P { graph [fontname="DejaVu Sans" fontsize=22 pad=0.2]; node [fontname="
  auth [label="auth\nAuthController, AuthService\nJwtStrategy, guards"]; users [label="users\nUsersService"]; products [label="products\nController + Service"];
  orders [label="orders\nOrdersController/Service\nStockService, order-status"]; payments [label="payments\nPaymentsController/Service\nMockPaymentGateway"]; promo [label="promotions\nPromotionsService\ncomputeDiscount, pointsFor"];
  ent [label="entities\nUser · Product · Order\nOrderItem · Payment · Coupon" fillcolor="#e3ecf6"]; common [label="common\ncatalog (size/topping)\ncurrent-user, db-errors" fillcolor="#e8f0e4"]; seed [label="seed\nSeedService (dữ liệu mẫu)"];
- app -> {auth products orders payments seed};
+ app -> {auth products payments};
+ seed -> app [dir=back style=invis]; products -> seed [style=invis];
  auth -> users; payments -> orders; orders -> promo; orders -> common; products -> common;
  {auth users products orders payments promo seed} -> ent [color="#4a6fa5" style=dashed];
 }
