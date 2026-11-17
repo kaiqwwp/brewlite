@@ -143,7 +143,7 @@ BrewLite là ứng dụng web cho phép khách hàng xem menu, chọn đồ uố
 
 \begin{itemize}
   \item \textbf{Kết quả:} hoàn thành đủ 10/10 task, đạt Definition of Done (Mục~\ref{sec:dod}). Luồng end-to-end chọn sản phẩm $\to$ giỏ hàng $\to$ đăng nhập $\to$ thanh toán $\to$ xác nhận đơn chạy được từ trình duyệt.
-  \item \textbf{Kiểm thử:} 34 test tự động (11 unit + 23 integration trên PostgreSQL thật) đều đạt; ba tiêu chí chấm của Task 10 (chặn chuyển trạng thái sai, idempotent, không bán vượt tồn kho) đều có test chứng minh (Mục~\ref{sec:test}).
+  \item \textbf{Kiểm thử:} 34 test tự động (11 unit + 23 integration trên PostgreSQL thật) đều đạt; ba tiêu chí chấm của Task 10 (chặn chuyển trạng thái sai, idempotent, không bán vượt tồn kho) đều có test chứng minh (Mục~\ref{sec:test}). Thêm 55 kịch bản kiểm thử giao diện (224 điểm kiểm tra) đã phát hiện và sửa 6 lỗi nghiệp vụ (Mục~\ref{sec:uitest}).
   \item \textbf{Bàn giao:} mã nguồn Git, \texttt{docker-compose.yml} chạy cả 3 dịch vụ (frontend, backend, DB), README hướng dẫn chạy (Mục~\ref{sec:handover}).
 \end{itemize}
 
@@ -281,7 +281,7 @@ Chạy trên trình duyệt web & Next.js + TailwindCSS, bố cục responsive &
 \end{table}
 
 \subsection{User Story}
-\begin{longtable}{|L{1.4cm}|L{6.3cm}|L{7.3cm}|}
+\begin{longtable}{|L{1.4cm}|L{5.4cm}|L{6.3cm}|}
 \hline
 \textbf{Mã} & \textbf{User Story} & \textbf{Tiêu chí chấp nhận (rút gọn)} \\ \hline
 \endhead
@@ -509,7 +509,7 @@ Giao diện bám sát 5 màn hình wireframe của đề: (1) Menu, (2) Chi ti�
 \section{Product Backlog: 10 task theo Scrum}\label{sec:backlog}
 Mỗi task hoàn thành (đạt Definition of Done ở Mục~\ref{sec:dod}) được 1 điểm, tổng 10 điểm. Cột ``Bằng chứng'' chỉ tới mã nguồn/test trong repository.
 
-\begin{longtable}{|L{0.6cm}|L{2.6cm}|L{4.8cm}|L{0.8cm}|L{1.0cm}|L{4.6cm}|}
+\begin{longtable}{|L{0.6cm}|L{2.2cm}|L{3.9cm}|L{0.7cm}|L{0.9cm}|L{3.7cm}|}
 \hline
 \textbf{\#} & \textbf{Task} & \textbf{Kết quả đạt được} & \textbf{SP} & \textbf{Sprint} & \textbf{Bằng chứng} \\ \hline
 \endhead
@@ -623,7 +623,7 @@ Chạy bằng \texttt{npm run test:all} trong \texttt{backend/} (PostgreSQL 16 t
 \end{table}
 
 \subsection{Danh sách test}
-\begin{longtable}{|L{3.6cm}|L{9.6cm}|L{1.5cm}|}
+\begin{longtable}{|L{3.6cm}|L{8.4cm}|L{1.3cm}|}
 \hline
 \textbf{Nhóm} & \textbf{Nội dung kiểm tra} & \textbf{Kết quả} \\ \hline
 \endhead
@@ -643,7 +643,45 @@ Task 10.4 -- Khuyến mãi (3) & Áp mã, cộng điểm chỉ khi PAID, thu h�
 \end{longtable}
 
 \subsection{Kiểm thử giao diện end-to-end}
-Kịch bản Playwright (Chromium) trên bản build production: mở Menu (8 sản phẩm) $\to$ chọn Cappuccino size L + trân châu (giá hiển thị 57.000đ) $\to$ thêm giỏ $\to$ thêm Trà đào (size M) $\to$ giỏ (2 dòng, tổng 96.000đ) $\to$ bấm Thanh toán khi chưa đăng nhập (chuyển \texttt{/login}) $\to$ đăng ký $\to$ thanh toán \textbf{lỗi} có mã \texttt{BREW10} (đơn \st{PAYMENT\_FAILED}, giỏ còn 2 dòng) $\to$ thử lại thành công $\to$ màn hình xác nhận (mã đơn \#1, \st{PAID}, tổng 86.400đ sau giảm 9.600đ, cộng 8 điểm, giỏ rỗng) $\to$ lịch sử đơn (1 đơn). Không có lỗi JavaScript ngoài phản hồi 402 có chủ đích. Ngoài ra một bộ 55 kịch bản giao diện chạy qua Playwright (224 điểm kiểm tra, đối chiếu cả cơ sở dữ liệu) đã phát hiện và giúp sửa 6 lỗi nghiệp vụ; chi tiết ở tài liệu riêng \texttt{docs/BrewLite\_Bao\_cao\_kiem\_thu.pdf}.
+Kịch bản Playwright (Chromium) trên bản build production: mở Menu (8 sản phẩm) $\to$ chọn Cappuccino size L + trân châu (giá hiển thị 57.000đ) $\to$ thêm giỏ $\to$ thêm Trà đào (size M) $\to$ giỏ (2 dòng, tổng 96.000đ) $\to$ bấm Thanh toán khi chưa đăng nhập (chuyển \texttt{/login}) $\to$ đăng ký $\to$ thanh toán \textbf{lỗi} có mã \texttt{BREW10} (đơn \st{PAYMENT\_FAILED}, giỏ còn 2 dòng) $\to$ thử lại thành công $\to$ màn hình xác nhận (mã đơn \#1, \st{PAID}, tổng 86.400đ sau giảm 9.600đ, cộng 8 điểm, giỏ rỗng) $\to$ lịch sử đơn (1 đơn). Không có lỗi JavaScript ngoài phản hồi 402 có chủ đích.
+
+\subsection{Kiểm thử giao diện mở rộng và lỗi nghiệp vụ phát hiện}\label{sec:uitest}
+Ngoài kịch bản chính ở trên, một bộ \textbf{55 kịch bản} Playwright (Chromium thật, backend và PostgreSQL thật) được chạy để tìm lỗi \emph{nghiệp vụ}. Sau mỗi thao tác trên giao diện, kịch bản đối chiếu lại cơ sở dữ liệu (số đơn, trạng thái, tồn kho, điểm thưởng, số giao dịch thanh toán). Các tình huống bất thường được mô phỏng: ngắt mạng đúng lúc nhận phản hồi, bấm liên tục, hai trình duyệt cùng mua ly cuối, giá đổi khi khách đang xem giỏ, token hỏng, tải lại giữa chừng. Kết quả lượt chạy cuối (sau khi sửa lỗi): \textbf{55/55 kịch bản, 224/224 điểm kiểm tra đạt}.
+
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{|X|c|c|c|}
+\hline
+\textbf{Nhóm kiểm thử} & \textbf{Kịch bản} & \textbf{Điểm kiểm tra} & \textbf{Kết quả} \\ \hline
+A. Menu và chi tiết sản phẩm & 8 & 25 & 8/8 \\ \hline
+B. Giỏ hàng & 5 & 16 & 5/5 \\ \hline
+C. Tài khoản và phân quyền giao diện & 9 & 21 & 9/9 \\ \hline
+D. Thanh toán và mã giảm giá & 12 & 56 & 12/12 \\ \hline
+E. Đơn hàng: lịch sử, chi tiết, hủy, trạng thái & 6 & 21 & 6/6 \\ \hline
+F. Tồn kho và dữ liệu thay đổi & 5 & 20 & 5/5 \\ \hline
+G. Bảo mật và kiểm tra dữ liệu đầu vào (API) & 7 & 55 & 7/7 \\ \hline
+H. Giao diện di động và độ ổn định & 3 & 10 & 3/3 \\ \hline
+\textbf{Tổng} & \textbf{55} & \textbf{224} & \textbf{55/55} \\ \hline
+\end{tabularx}
+\caption{Tổng hợp kiểm thử giao diện theo nhóm}
+\end{table}
+
+Lượt chạy đầu tiên phát hiện 6 lỗi, đã sửa và chạy lại toàn bộ (chi tiết từng kịch bản, ảnh chụp: \texttt{docs/BrewLite\_Bao\_cao\_kiem\_thu.pdf}):
+\begin{longtable}{|L{0.9cm}|L{1.3cm}|L{4.2cm}|L{5.8cm}|}
+\hline
+\textbf{Mã} & \textbf{Mức} & \textbf{Lỗi} & \textbf{Cách sửa} \\ \hline
+\endhead
+F04 & Cao & Giá server đổi sau khi khách bỏ món vào giỏ nhưng vẫn thanh toán: khách bị trừ số tiền chưa được thấy. & Thanh toán so sánh tổng đơn với tổng giỏ; lệch thì dừng, báo giá mới và chờ khách xác nhận lại. \\ \hline
+D11 & Trung bình & Thanh toán lỗi rồi tải lại trang tạo đơn thứ hai; đơn lỗi cũ vẫn giữ kho. & Khi lỗi, đưa về \texttt{/checkout?order=ID} để thử lại dùng đúng đơn cũ. \\ \hline
+D12 & Trung bình & Thanh toán lại từ trang chi tiết đơn xong nhưng giỏ không được xóa. & Chỉ xóa các dòng giỏ khớp món trong đơn đã thanh toán. \\ \hline
+E06 & Trung bình & Hủy đơn đã thanh toán không thu hồi điểm thưởng (mua rồi hủy vẫn giữ điểm). & Thêm \texttt{revokePoints} dùng cờ \texttt{pointsAwarded} (hủy hai lần không trừ hai lần) và test tích hợp. \\ \hline
+C07 & Thấp & Token hết hạn hoặc hỏng: giao diện kẹt ở trạng thái đã đăng nhập, lỗi lặp lại. & Nhận 401 thì tự đăng xuất và chuyển về \texttt{/login}. \\ \hline
+G07 & Thấp & Không đặt \texttt{CORS\_ORIGIN} thì chấp nhận mọi nguồn gốc. & Mặc định chỉ cho phép \texttt{http://localhost:3000}. \\ \hline
+\caption{Lỗi nghiệp vụ phát hiện qua kiểm thử giao diện}
+\end{longtable}
+
+\subsection{Hạn chế đã biết}
+{\sloppy Các điểm sau nằm ngoài yêu cầu của đề, được ghi rõ để tránh hiểu nhầm là đã làm: (1) đơn \st{PENDING} không tự hết hạn nên có thể giữ kho vô thời hạn; (2) giỏ hàng lưu theo trình duyệt, không theo tài khoản; (3) cổng thanh toán là giả lập và chưa có quy trình hoàn tiền khi hủy đơn đã thanh toán; (4) tồn kho tính theo sản phẩm, không theo nguyên liệu; (5) chưa có giao diện cho nhân viên (cập nhật trạng thái qua API); (6) JWT lưu trong \texttt{localStorage}; (7) mới kiểm thử trên Chromium, chưa kiểm thử tải lớn.\par}
 
 %%%%%%%%%%%%%%%%%%%% 11. DoD %%%%%%%%%%%%%%%%%%%% 
 \section{Definition of Done}\label{sec:dod}
@@ -652,7 +690,7 @@ Kịch bản Playwright (Chromium) trên bản build production: mở Menu (8 s�
 \begin{tabularx}{\textwidth}{|X|L{6.6cm}|}
 \hline
 \textbf{Tiêu chí DoD} & \textbf{Minh chứng} \\ \hline
-Code chạy được, không lỗi build; đúng tiêu chí chấp nhận & \texttt{npm run build} (backend) và \texttt{next build} (frontend) thành công; 33 test đạt \\ \hline
+Code chạy được, không lỗi build; đúng tiêu chí chấp nhận & \texttt{npm run build} (backend) và \texttt{next build} (frontend) thành công; 34 test đạt \\ \hline
 Có commit Git với mô tả rõ ràng; được review trong nhóm & Lịch sử Git của repository (commit theo thành phần/task); do dự án một thành viên nên tự review theo checklist DoD trước mỗi lần commit/merge \\ \hline
 API có validate đầu vào; UI xử lý loading/lỗi cơ bản & \texttt{ValidationPipe} + DTO; test 400; Spinner/ErrorBox/Empty ở mọi trang tải dữ liệu \\ \hline
 Có hướng dẫn chạy trong README & \texttt{README.md}: chạy bằng Docker Compose, chạy thủ công, kiểm thử, API, tài khoản mẫu \\ \hline
@@ -673,7 +711,7 @@ Có hướng dẫn chạy trong README & \texttt{README.md}: chạy bằng Docke
 \end{enumerate}
 
 \subsection{Danh mục bàn giao}
-Mã nguồn Git (\texttt{backend/}, \texttt{frontend/}), \texttt{docker-compose.yml} chạy được cả 3 dịch vụ, \texttt{README.md}, \texttt{.env.example}, báo cáo này, ảnh chụp màn hình và kết quả test trong \texttt{docs/}.
+Mã nguồn Git (\texttt{backend/}, \texttt{frontend/}), \texttt{docker-compose.yml} chạy được cả 3 dịch vụ, \texttt{README.md}, \texttt{.env.example}, báo cáo này, báo cáo kiểm thử giao diện, bộ kịch bản Playwright, ảnh chụp màn hình, các sơ đồ dạng draw.io (\texttt{docs/drawio/}, chỉnh sửa được) và kết quả test trong \texttt{docs/}.
 
 \subsection{Sprint Retrospective}
 Retrospective được thực hiện vào cuối Sprint 3 (10/11/2026) với cách nhìn lại cả ba Sprint.
@@ -681,6 +719,7 @@ Retrospective được thực hiện vào cuối Sprint 3 (10/11/2026) với cá
 \hline
 \textbf{Điều làm tốt} & \textbf{Điều cần cải thiện} \\ \hline
 \begin{itemize}\itemsep0pt
+  \item Kiểm thử giao diện có đối chiếu cơ sở dữ liệu tìm ra 6 lỗi nghiệp vụ mà test API không thấy (ví dụ giá đổi khi khách đang xem giỏ).
   \item Viết test song song với nghiệp vụ khó (đồng thời, idempotent) nên phát hiện sớm lỗi đua dữ liệu.
   \item Server luôn tính lại giá, client không thể gian lận giá.
   \item Tách hàm thuần (giá, giảm giá, state machine) giúp unit test nhanh.
@@ -732,14 +771,14 @@ Các hạng mục đề xuất cho phiên bản 1.1:
 \begin{itemize}
   \item \texttt{Product(id, name, price, imageUrl, stock)} --- thêm \texttt{description}, \texttt{version} (optimistic locking).
   \item \texttt{User(id, email, passwordHash, loyaltyPoints)} --- thêm \texttt{name}, \texttt{role}.
-  \item \texttt{Order(id, userId, status, total, createdAt)} --- thêm \texttt{subtotal}, \texttt{discount}, \texttt{couponCode}, \texttt{idempotencyKey}, \texttt{pointsAwarded}.
+  \item \texttt{Order(id, userId, status, total, createdAt)} --- thêm \texttt{subtotal},\allowbreak{} \texttt{discount},\allowbreak{} \texttt{couponCode},\allowbreak{} \texttt{idempotencyKey},\allowbreak{} \texttt{pointsAwarded}.
   \item \texttt{OrderItem(id, orderId, productId, size, qty, lineTotal)} --- thêm \texttt{productName}, \texttt{toppings}, \texttt{unitPrice}.
   \item \texttt{Payment(id, orderId, idempotencyKey, amount, method)} --- thêm \texttt{userId}, \texttt{status}, \texttt{reference}, \texttt{failureReason}.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%% 14. KẾT LUẬN %%%%%%%%%%%%%%%%%%%%
 \section{Kết luận}
-Nhóm đã xây dựng BrewLite theo Agile Scrum, hoàn thành 10/10 task: từ khởi tạo dự án, menu, giỏ hàng, đăng nhập JWT, đặt đơn, thanh toán không tiền mặt, đến các nghiệp vụ backend thực tế (state machine, idempotent, tồn kho đồng thời, khuyến mãi/điểm thưởng) có test chứng minh. Hạn chế hiện tại là cổng thanh toán giả lập, chưa có giao diện barista và chưa dùng migration; các hạng mục này được ghi vào backlog cho phiên bản tiếp theo.
+Nhóm đã xây dựng BrewLite theo Agile Scrum, hoàn thành 10/10 task: từ khởi tạo dự án, menu, giỏ hàng, đăng nhập JWT, đặt đơn, thanh toán không tiền mặt, đến các nghiệp vụ backend thực tế (state machine, idempotent, tồn kho đồng thời, khuyến mãi/điểm thưởng) có test chứng minh. Kiểm thử giao diện (55 kịch bản) tìm và giúp sửa thêm 6 lỗi nghiệp vụ. Hạn chế hiện tại là cổng thanh toán giả lập, chưa có giao diện barista và chưa dùng migration (xem thêm Mục~\ref{sec:uitest}); các hạng mục này được ghi vào backlog cho phiên bản tiếp theo.
 
 %%%%%%%%%%%%%%%%%%%% TÀI LIỆU THAM KHẢO %%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{80}
