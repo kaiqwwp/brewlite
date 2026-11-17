@@ -1,0 +1,1966 @@
+[
+ {
+  "id": "A01",
+  "cat": "A. Menu và chi tiết sản phẩm",
+  "title": "Menu hiển thị đủ 8 sản phẩm kèm tên, giá, ảnh",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Số sản phẩm = 8",
+    "ok": true,
+    "actual": "8"
+   },
+   {
+    "desc": "\"Cà phê sữa\" hiển thị giá 35.000đ",
+    "ok": true,
+    "actual": "Cà phê sữa |  | 35.000đ"
+   },
+   {
+    "desc": "\"Americano\" hiển thị giá 40.000đ",
+    "ok": true,
+    "actual": "Americano |  | 40.000đ"
+   },
+   {
+    "desc": "\"Cappuccino\" hiển thị giá 45.000đ",
+    "ok": true,
+    "actual": "Cappuccino |  | 45.000đ"
+   },
+   {
+    "desc": "\"Trà đào\" hiển thị giá 39.000đ",
+    "ok": true,
+    "actual": "Trà đào |  | 39.000đ"
+   },
+   {
+    "desc": "\"Latte\" hiển thị giá 45.000đ",
+    "ok": true,
+    "actual": "Latte |  | 45.000đ"
+   },
+   {
+    "desc": "\"Bạc xỉu\" hiển thị giá 38.000đ",
+    "ok": true,
+    "actual": "Bạc xỉu |  | 38.000đ"
+   },
+   {
+    "desc": "\"Trà vải\" hiển thị giá 39.000đ",
+    "ok": true,
+    "actual": "Trà vải |  | 39.000đ"
+   },
+   {
+    "desc": "\"Matcha đá xay\" hiển thị giá 55.000đ",
+    "ok": true,
+    "actual": "Matcha đá xay |  | 55.000đ"
+   },
+   {
+    "desc": "Mọi ảnh sản phẩm tải được",
+    "ok": true,
+    "actual": "0 ảnh lỗi"
+   }
+  ],
+  "shots": [
+   "A01_menu.png"
+  ],
+  "expected": "8 thẻ sản phẩm, đúng tên và giá, ảnh tải được",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946247851,
+  "ms": 547
+ },
+ {
+  "id": "A02",
+  "cat": "A. Menu và chi tiết sản phẩm",
+  "title": "Lỗi mạng khi tải menu: hiện thông báo và nút Thử lại hoạt động",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện thông báo lỗi kết nối",
+    "ok": true,
+    "actual": "Không kết nối được máy chủ. Vui lòng thử lại.\n\nThử lại"
+   },
+   {
+    "desc": "Thử lại thành công, menu hiện",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "A02_error.png"
+  ],
+  "expected": "Hiện hộp lỗi + Thử lại; sau khi mạng ổn bấm Thử lại thì menu hiện",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946248398,
+  "ms": 530
+ },
+ {
+  "id": "A03",
+  "cat": "A. Menu và chi tiết sản phẩm",
+  "title": "Menu trống hiển thị trạng thái rỗng",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện trạng thái rỗng",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "A03_empty.png"
+  ],
+  "expected": "Hiện \"Menu đang trống\"",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946248928,
+  "ms": 466
+ },
+ {
+  "id": "A04",
+  "cat": "A. Menu và chi tiết sản phẩm",
+  "title": "Trang chi tiết: giá mặc định (size M), đổi size S/M/L",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Mặc định size M = 45.000đ",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Size S = 40.000đ",
+    "ok": true,
+    "actual": "40000"
+   },
+   {
+    "desc": "Size L = 52.000đ",
+    "ok": true,
+    "actual": "52000"
+   },
+   {
+    "desc": "Size M = 45.000đ",
+    "ok": true,
+    "actual": "45000"
+   }
+  ],
+  "shots": [
+   "A04_detail.png"
+  ],
+  "expected": "Giá = giá gốc + chênh lệch size (S −5k, M 0, L +7k)",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946249394,
+  "ms": 702
+ },
+ {
+  "id": "A05",
+  "cat": "A. Menu và chi tiết sản phẩm",
+  "title": "Giá theo mọi tổ hợp size × topping (48 tổ hợp) cho Cappuccino",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Cả 48 tổ hợp đều đúng giá",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Giá hiển thị khớp công thức server cho từng tổ hợp",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946250096,
+  "ms": 4042
+ },
+ {
+  "id": "A06",
+  "cat": "A. Menu và chi tiết sản phẩm",
+  "title": "Số lượng ở trang chi tiết: tối thiểu 1, tối đa 20, giá nhân theo số lượng",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Giảm ở 1 vẫn là 1",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Tăng 25 lần dừng ở 20",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Tạm tính = 20 × 35.000đ",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "A06_qty20.png"
+  ],
+  "expected": "Không giảm dưới 1, không tăng quá 20, tạm tính = đơn giá × số lượng",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946254138,
+  "ms": 1491
+ },
+ {
+  "id": "A07",
+  "cat": "A. Menu và chi tiết sản phẩm",
+  "title": "Sản phẩm không tồn tại / id sai",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "/products/9999 báo không tìm thấy",
+    "ok": true,
+    "actual": "Không tìm thấy sản phẩm."
+   },
+   {
+    "desc": "/products/abc hiện lỗi dễ hiểu (không crash)",
+    "ok": true,
+    "actual": "Validation failed (numeric string is expected)"
+   }
+  ],
+  "shots": [
+   "A07_notfound.png"
+  ],
+  "expected": "Thông báo \"Không tìm thấy sản phẩm\", không trang trắng",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946255629,
+  "ms": 974
+ },
+ {
+  "id": "A08",
+  "cat": "A. Menu và chi tiết sản phẩm",
+  "title": "Sản phẩm hết hàng: menu báo \"Hết hàng\", nút thêm giỏ bị vô hiệu",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Menu có nhãn Hết hàng",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Nút bị vô hiệu",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "A08_menu.png"
+  ],
+  "expected": "Menu có nhãn Hết hàng; nút \"Hết hàng\" disabled",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946256603,
+  "ms": 1086
+ },
+ {
+  "id": "B01",
+  "cat": "B. Giỏ hàng",
+  "title": "Thêm vào giỏ: badge đếm đúng, cùng cấu hình gộp dòng, khác size tách dòng",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Badge = 1",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Thêm lại cùng cấu hình → badge 2",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Có 2 dòng (L+Trân châu ×2 và M ×1)",
+    "ok": true,
+    "actual": "2"
+   },
+   {
+    "desc": "Tổng = 159.000đ",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "B01_cart.png"
+  ],
+  "expected": "Cùng món/size/topping cộng dồn; khác size là dòng riêng; badge = tổng số lượng",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946257690,
+  "ms": 2438
+ },
+ {
+  "id": "B02",
+  "cat": "B. Giỏ hàng",
+  "title": "Giỏ hàng: tăng, giảm, giảm về 0 thì xóa dòng, nút Xóa, Xóa tất cả",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Tổng ban đầu đúng",
+    "ok": true,
+    "actual": "121000"
+   },
+   {
+    "desc": "Tăng món 1 → 3 ly",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Giảm còn 1 ly",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Giảm về 0 thì dòng bị xóa",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Xóa dòng cuối → giỏ trống",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "\"Xóa tất cả\" làm trống giỏ",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "B02_empty.png"
+  ],
+  "expected": "Tổng cập nhật đúng sau mỗi thao tác; giỏ rỗng hiện trạng thái trống",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946260128,
+  "ms": 1240
+ },
+ {
+  "id": "B03",
+  "cat": "B. Giỏ hàng",
+  "title": "Giỏ hàng được lưu qua lần tải lại trang (localStorage/Zustand persist)",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Còn 1 dòng sau reload",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Badge vẫn là 2",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Reload vẫn còn sản phẩm và badge",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946261370,
+  "ms": 1440
+ },
+ {
+  "id": "B04",
+  "cat": "B. Giỏ hàng",
+  "title": "Giới hạn 20 ly mỗi dòng khi cộng dồn trong giỏ",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Tăng ở 20 vẫn là 20",
+    "ok": true,
+    "actual": "20"
+   },
+   {
+    "desc": "Thêm 5 ly vào dòng đã có 20 → vẫn 20",
+    "ok": true,
+    "actual": "20"
+   }
+  ],
+  "shots": [],
+  "expected": "Không vượt 20",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946262811,
+  "ms": 1642
+ },
+ {
+  "id": "B05",
+  "cat": "B. Giỏ hàng",
+  "title": "Thanh toán khi giỏ trống / vào /checkout trực tiếp",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện \"Giỏ hàng trống\"",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "API từ chối giỏ rỗng (400)",
+    "ok": true,
+    "actual": "400"
+   }
+  ],
+  "shots": [
+   "B05_checkout-empty.png"
+  ],
+  "expected": "Không tạo đơn rỗng; hiện giỏ trống",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946264453,
+  "ms": 568
+ },
+ {
+  "id": "C01",
+  "cat": "C. Tài khoản và phân quyền giao diện",
+  "title": "Đăng ký tài khoản mới trên giao diện",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Header hiện điểm tích lũy 0",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Về trang chủ sau đăng ký",
+    "ok": true,
+    "actual": "http://localhost:3000/"
+   }
+  ],
+  "shots": [
+   "C01_form.png",
+   "C01_after.png"
+  ],
+  "expected": "Đăng ký xong tự đăng nhập, header hiện \"Đơn của tôi\", điểm 0",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946265025,
+  "ms": 795
+ },
+ {
+  "id": "C02",
+  "cat": "C. Tài khoản và phân quyền giao diện",
+  "title": "Đăng ký trùng email",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện lỗi trùng email",
+    "ok": true,
+    "actual": "Email đã được đăng ký"
+   }
+  ],
+  "shots": [
+   "C02_dup.png"
+  ],
+  "expected": "Báo lỗi email đã tồn tại, không đăng nhập",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946265820,
+  "ms": 624
+ },
+ {
+  "id": "C03",
+  "cat": "C. Tài khoản và phân quyền giao diện",
+  "title": "Kiểm tra dữ liệu đăng ký: mật khẩu ngắn, email sai (UI và API)",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Mật khẩu 3 ký tự bị chặn ở form (vẫn ở /register)",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "API: mật khẩu 5 ký tự → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "API: email sai định dạng → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "API: gửi thêm trường role=STAFF bị từ chối (chống leo quyền)",
+    "ok": true,
+    "actual": "400"
+   }
+  ],
+  "shots": [
+   "C03_short.png"
+  ],
+  "expected": "Giao diện chặn; API trả 400",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946266444,
+  "ms": 555
+ },
+ {
+  "id": "C04",
+  "cat": "C. Tài khoản và phân quyền giao diện",
+  "title": "Đăng nhập sai mật khẩu / email không tồn tại",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Cả hai trường hợp đều báo lỗi",
+    "ok": true,
+    "actual": "Sai email hoặc mật khẩu | Sai email hoặc mật khẩu"
+   },
+   {
+    "desc": "Hai thông báo giống nhau (không lộ email tồn tại)",
+    "ok": true,
+    "actual": "Sai email hoặc mật khẩu | Sai email hoặc mật khẩu"
+   }
+  ],
+  "shots": [
+   "C04_wrong.png"
+  ],
+  "expected": "Báo lỗi, không đăng nhập; thông báo không lộ email có tồn tại hay không",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946266999,
+  "ms": 1145
+ },
+ {
+  "id": "C05",
+  "cat": "C. Tài khoản và phân quyền giao diện",
+  "title": "Đăng nhập, tải lại vẫn giữ phiên, đăng xuất xóa phiên",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Reload vẫn đăng nhập",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Đăng xuất thành công",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Sau đăng xuất, /orders chuyển về /login?next=/orders",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Phiên lưu qua reload; đăng xuất ẩn \"Đơn của tôi\"",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946268144,
+  "ms": 1546
+ },
+ {
+  "id": "C06",
+  "cat": "C. Tài khoản và phân quyền giao diện",
+  "title": "Trang cần đăng nhập chuyển hướng rồi quay lại đúng trang sau khi đăng nhập",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Thanh toán khi chưa đăng nhập → /login?next=/checkout",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Đăng nhập xong quay về /checkout, giỏ còn nguyên",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "C06_back.png"
+  ],
+  "expected": "/orders và /checkout redirect; đăng nhập xong về đúng next",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946269690,
+  "ms": 921
+ },
+ {
+  "id": "C07",
+  "cat": "C. Tài khoản và phân quyền giao diện",
+  "title": "Token hỏng / hết hạn khi đang dùng",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "/orders với token hỏng/hết hạn tự đăng xuất và chuyển về /login?next=/orders",
+    "ok": true,
+    "actual": "☕ BrewLite Đăng nhập 🛒 Giỏ hàng 1 Đăng nhập Email Mật khẩu Đăng nhập  Chưa có tài khoản? Đăng ký  B"
+   },
+   {
+    "desc": "Checkout với token hỏng → logout + về /login",
+    "ok": true,
+    "actual": "http://localhost:3000/login?next=/checkout"
+   }
+  ],
+  "shots": [
+   "C07_orders-badtoken.png"
+  ],
+  "expected": "Không treo giao diện; người dùng được đưa về đăng nhập hoặc thấy lỗi rõ ràng",
+  "status": "PASS",
+  "notes": [
+   "/orders với token hỏng: url=http://localhost:3000/login?next=%2Forders, nội dung=\"☕ BrewLite Đăng nhập 🛒 Giỏ hàng 1 Đăng nhập Email Mật khẩu Đăng nhập  Chưa có tài khoản? Đăng ký  BrewLite – Bài tập lớ\""
+  ],
+  "t0": 1794946270611,
+  "ms": 1512
+ },
+ {
+  "id": "C08",
+  "cat": "C. Tài khoản và phân quyền giao diện",
+  "title": "Email viết hoa/thường và khoảng trắng khi đăng nhập",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Đăng nhập với email VIẾT HOA thành công (email thường không phân biệt hoa thường)",
+    "ok": true,
+    "actual": "200"
+   },
+   {
+    "desc": "Đăng ký lại cùng email khác hoa thường bị từ chối (409)",
+    "ok": true,
+    "actual": "409"
+   }
+  ],
+  "shots": [],
+  "expected": "Đăng nhập không phân biệt hoa thường email",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946272123,
+  "ms": 153
+ },
+ {
+  "id": "C09",
+  "cat": "C. Tài khoản và phân quyền giao diện",
+  "title": "Chuỗi nguy hiểm trong tên và email (XSS, SQL injection)",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "SQLi ở login → 400/401 (không 500, không đăng nhập)",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "Đăng ký tên chứa HTML được chấp nhận hoặc từ chối an toàn",
+    "ok": true,
+    "actual": "201"
+   },
+   {
+    "desc": "Tên chứa HTML không thực thi script",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Không chạy script, không lỗi 500, không lộ dữ liệu",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946272276,
+  "ms": 1673
+ },
+ {
+  "id": "D01",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Luồng chính: thanh toán ví điện tử thành công",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Giỏ 96.000đ",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Mặc định chọn Ví điện tử",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Trạng thái PAID",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Có mã đơn",
+    "ok": true,
+    "actual": "Mã đơn: #52"
+   },
+   {
+    "desc": "Tiêu đề \"Đặt hàng thành công\"",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Giỏ hàng được xóa",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Điểm trên header = 9",
+    "ok": true,
+    "actual": "☕\nBrewLite\nĐơn của tôi\n★ 9 điểm\nĐăng xuất\n🛒 Giỏ hàng\n0"
+   },
+   {
+    "desc": "Điểm trên server khớp",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "D01_checkout.png",
+   "D01_confirm.png"
+  ],
+  "expected": "Đơn PAID, mã đơn hiển thị, giỏ rỗng, header cộng điểm (96.000đ → 9 điểm)",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946273949,
+  "ms": 1474
+ },
+ {
+  "id": "D02",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Thanh toán bằng thẻ ngân hàng",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "PAID",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Phương thức lưu là CARD",
+    "ok": true,
+    "actual": "CARD"
+   }
+  ],
+  "shots": [],
+  "expected": "Chọn Thẻ ngân hàng → PAID",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946275425,
+  "ms": 918
+ },
+ {
+  "id": "D03",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Mã BREW10 trên giao diện: giảm 10%, hiển thị ở checkout và xác nhận",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện dòng giảm giá BREW10 −9.600đ",
+    "ok": true,
+    "actual": "✓ Đặt hàng thành công  Mã đơn: #54  Trạng thái: PAID (Đã thanh toán)  Mời tới quầy lấy nước khi đơn sẵn sàng.  Cappuccino · L (+1 topping) × 1 57.000đ Trà đào ·"
+   },
+   {
+    "desc": "Tổng 86.400đ",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Cộng 8 điểm",
+    "ok": true,
+    "actual": "8"
+   }
+  ],
+  "shots": [
+   "D03_coupon.png",
+   "D03_confirm.png"
+  ],
+  "expected": "96.000đ → giảm 9.600đ → 86.400đ, 8 điểm",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946276343,
+  "ms": 860
+ },
+ {
+  "id": "D04",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Ma trận mã giảm giá (BREW10, WELCOME20) theo giá trị đơn",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "BREW10, đơn 110.000đ → giảm 11.000đ",
+    "ok": true,
+    "actual": "[201,11000,99000]"
+   },
+   {
+    "desc": "BREW10, đơn 330.000đ → giảm tối đa 20.000đ",
+    "ok": true,
+    "actual": "[201,20000]"
+   },
+   {
+    "desc": "WELCOME20, đơn 90.000đ (<100k) → bị từ chối 400",
+    "ok": true,
+    "actual": "400 Đơn tối thiểu 100000đ để dùng mã WELCOME20"
+   },
+   {
+    "desc": "WELCOME20, đơn 110.000đ → giảm 22.000đ",
+    "ok": true,
+    "actual": "[201,22000]"
+   },
+   {
+    "desc": "WELCOME20, đơn 330.000đ → giảm tối đa 50.000đ",
+    "ok": true,
+    "actual": "[201,50000]"
+   },
+   {
+    "desc": "Mã không tồn tại → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "Mã viết thường \"brew10\" vẫn nhận",
+    "ok": true,
+    "actual": "[201,3500]"
+   },
+   {
+    "desc": "Mã có khoảng trắng hai đầu vẫn nhận",
+    "ok": true,
+    "actual": "[201,3500]"
+   },
+   {
+    "desc": "Mã chỉ toàn khoảng trắng không gây lỗi 500",
+    "ok": true,
+    "actual": "400"
+   }
+  ],
+  "shots": [],
+  "expected": "Đúng tỷ lệ, trần giảm, điều kiện đơn tối thiểu",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946277204,
+  "ms": 171
+ },
+ {
+  "id": "D05",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Mã giảm giá sai trên giao diện: báo lỗi, giữ giỏ, không tạo đơn",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện thông báo mã không hợp lệ",
+    "ok": true,
+    "actual": "Mã giảm giá không hợp lệ"
+   },
+   {
+    "desc": "Giỏ vẫn còn",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Chưa tạo đơn nào",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Sửa mã đúng rồi thanh toán được",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "D05_bad-coupon.png"
+  ],
+  "expected": "Hiện lỗi rõ ràng; giỏ còn; 0 đơn được tạo",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946277375,
+  "ms": 874
+ },
+ {
+  "id": "D06",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Thanh toán lỗi: giữ giỏ, giữ đơn, thử lại thành công, điểm chỉ cộng một lần",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện lỗi và nói giỏ được giữ",
+    "ok": true,
+    "actual": "Thanh toán bị từ chối (mô phỏng). Giỏ hàng được giữ nguyên, bạn có thể thử lại."
+   },
+   {
+    "desc": "Giỏ còn nguyên",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Có 1 đơn trạng thái PAYMENT_FAILED",
+    "ok": true,
+    "actual": "[\"PAYMENT_FAILED\"]"
+   },
+   {
+    "desc": "Kho vẫn đang giữ cho đơn (−2)",
+    "ok": true,
+    "actual": "98"
+   },
+   {
+    "desc": "Chưa có điểm",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Thử lại → PAID",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Vẫn chỉ 1 đơn (không tạo đơn mới khi thử lại)",
+    "ok": true,
+    "actual": "1"
+   },
+   {
+    "desc": "Điểm cộng đúng 1 lần = 9",
+    "ok": true,
+    "actual": "9"
+   },
+   {
+    "desc": "Số giao dịch thanh toán của đơn = 2 (1 lỗi + 1 thành công)",
+    "ok": true,
+    "actual": "2"
+   }
+  ],
+  "shots": [
+   "D06_failed.png"
+  ],
+  "expected": "PAYMENT_FAILED → thử lại → PAID; đúng 1 đơn; điểm cộng 1 lần",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946278249,
+  "ms": 1236
+ },
+ {
+  "id": "D07",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Thanh toán lỗi rồi hủy đơn: kho được hoàn lại",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Kho bị giữ (−3)",
+    "ok": true,
+    "actual": "97"
+   },
+   {
+    "desc": "Đơn CANCELLED",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Kho hoàn lại",
+    "ok": true,
+    "actual": "100"
+   },
+   {
+    "desc": "Nút Hủy/Thanh toán biến mất sau khi hủy",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "D07_order-failed.png",
+   "D07_cancelled.png"
+  ],
+  "expected": "Đơn CANCELLED, kho về như ban đầu",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946279485,
+  "ms": 1278
+ },
+ {
+  "id": "D08",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Bấm \"Xác nhận thanh toán\" liên tục (double / triple click)",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Chỉ 1 đơn được tạo",
+    "ok": true,
+    "actual": "1"
+   },
+   {
+    "desc": "Điểm không bị cộng nhiều lần",
+    "ok": true,
+    "actual": "3"
+   },
+   {
+    "desc": "Chỉ 1 giao dịch SUCCESS",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Chỉ 1 đơn và 1 giao dịch thành công",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946280763,
+  "ms": 1593
+ },
+ {
+  "id": "D09",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Mất kết nối ĐÚNG LÚC nhận phản hồi thanh toán, rồi bấm lại",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện lỗi kết nối, giỏ còn",
+    "ok": true,
+    "actual": "Không kết nối được máy chủ. Vui lòng thử lại."
+   },
+   {
+    "desc": "Phía server đơn đã PAID (thanh toán đã xử lý)",
+    "ok": true,
+    "actual": "PAID"
+   },
+   {
+    "desc": "Bấm lại → thấy PAID",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Chỉ 1 giao dịch SUCCESS (idempotent)",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Điểm cộng 1 lần",
+    "ok": true,
+    "actual": "7"
+   },
+   {
+    "desc": "Chỉ 1 đơn",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "D09_lost.png"
+  ],
+  "expected": "Không trừ tiền hai lần: 1 giao dịch SUCCESS, điểm 1 lần, đơn PAID",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946282356,
+  "ms": 1038
+ },
+ {
+  "id": "D10",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Mất kết nối ĐÚNG LÚC nhận phản hồi tạo đơn, rồi bấm lại",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Server đã tạo 1 đơn dù client không nhận được phản hồi",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Sau khi bấm lại vẫn chỉ 1 đơn",
+    "ok": true,
+    "actual": "1"
+   },
+   {
+    "desc": "Kho chỉ trừ 1 lần",
+    "ok": true,
+    "actual": "99"
+   }
+  ],
+  "shots": [],
+  "expected": "Không tạo đơn trùng (Idempotency-Key tạo đơn)",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946283394,
+  "ms": 976
+ },
+ {
+  "id": "D11",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Tải lại trang sau khi thanh toán lỗi rồi thanh toán lại",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Chỉ 1 đơn cho 1 giỏ hàng (không có đơn PAYMENT_FAILED mồ côi)",
+    "ok": true,
+    "actual": "1 đơn: PAID"
+   },
+   {
+    "desc": "Kho chỉ bị trừ cho 1 đơn (−2), không bị giữ thừa",
+    "ok": true,
+    "actual": "kho còn 98 / ban đầu 100"
+   }
+  ],
+  "shots": [],
+  "expected": "KHÔNG để lại đơn mồ côi giữ kho; chỉ 1 đơn cho 1 giỏ hàng",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946284370,
+  "ms": 1430
+ },
+ {
+  "id": "D12",
+  "cat": "D. Thanh toán và mã giảm giá",
+  "title": "Thanh toán lại từ trang chi tiết đơn (link \"Thanh toán lại\")",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Đơn PAID",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Giỏ hàng được xóa sau khi trả tiền cho đơn đó",
+    "ok": true,
+    "actual": "giỏ còn 0 dòng"
+   },
+   {
+    "desc": "Badge giỏ về 0",
+    "ok": true,
+    "actual": "0"
+   }
+  ],
+  "shots": [
+   "D12_after.png"
+  ],
+  "expected": "Sau khi trả tiền thành công, giỏ hàng cũ được dọn (không mua trùng)",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946285800,
+  "ms": 1187
+ },
+ {
+  "id": "E01",
+  "cat": "E. Đơn hàng: lịch sử, chi tiết, hủy, trạng thái",
+  "title": "Lịch sử đơn: trạng thái rỗng, thứ tự mới nhất trước, cô lập giữa người dùng",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Trạng thái rỗng",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Có đúng 2 đơn của mình (không lẫn đơn người khác)",
+    "ok": true,
+    "actual": "2"
+   },
+   {
+    "desc": "Đơn mới nhất ở trên cùng",
+    "ok": true,
+    "actual": "Đơn #70  03:11:27 18/11/2026 · 2 món  108.000đ  Đã thanh toán"
+   },
+   {
+    "desc": "Hiện trạng thái PAID cho đơn đã trả và \"Chờ thanh toán\" cho đơn chưa trả",
+    "ok": true,
+    "actual": "Đơn #70  03:11:27 18/11/2026 · 2 món  108.000đ  Đã thanh toán || Đơn #69  03:11:27 18/11/2026 · 1 món  35.000đ  Chờ thanh toán"
+   }
+  ],
+  "shots": [
+   "E01_empty.png",
+   "E01_list.png"
+  ],
+  "expected": "Người mới chưa có đơn; chỉ thấy đơn của mình; đơn mới ở trên",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946286987,
+  "ms": 1142
+ },
+ {
+  "id": "E02",
+  "cat": "E. Đơn hàng: lịch sử, chi tiết, hủy, trạng thái",
+  "title": "Truy cập đơn của người khác / đơn không tồn tại / id sai trên giao diện",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Đơn người khác → báo không phải đơn của bạn",
+    "ok": true,
+    "actual": "Không phải đơn của bạn\n\nThử lại"
+   },
+   {
+    "desc": "Không lộ mã/giá của đơn người khác",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Đơn không tồn tại → báo không tìm thấy",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Id không phải số → lỗi có kiểm soát (không 500)",
+    "ok": true,
+    "actual": "Validation failed (numeric string is expected)\n\nThử lại"
+   }
+  ],
+  "shots": [
+   "E02_forbidden.png"
+  ],
+  "expected": "Báo lỗi dễ hiểu, không lộ dữ liệu",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946288132,
+  "ms": 1708
+ },
+ {
+  "id": "E03",
+  "cat": "E. Đơn hàng: lịch sử, chi tiết, hủy, trạng thái",
+  "title": "Hủy đơn đã thanh toán: hộp xác nhận, hoàn kho; chọn \"Hủy\" ở hộp thoại thì giữ nguyên",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Từ chối hộp thoại → vẫn PAID",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Xác nhận → CANCELLED",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Kho hoàn lại +4",
+    "ok": true,
+    "actual": "96→100"
+   }
+  ],
+  "shots": [
+   "E03_cancelled.png"
+  ],
+  "expected": "Accept → CANCELLED + kho hoàn; Dismiss → đơn không đổi",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946289841,
+  "ms": 1409
+ },
+ {
+  "id": "E04",
+  "cat": "E. Đơn hàng: lịch sử, chi tiết, hủy, trạng thái",
+  "title": "Trạng thái pha chế do nhân viên cập nhật hiện lên trang đơn (tự làm mới)",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Nhân viên đặt PREPARING → 200",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Trang đơn tự cập nhật sang PREPARING",
+    "ok": true,
+    "actual": "5306ms"
+   },
+   {
+    "desc": "Nhân viên đặt READY → 200",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Trang đơn tự cập nhật sang READY",
+    "ok": true,
+    "actual": "4799ms"
+   },
+   {
+    "desc": "COMPLETED hiển thị, không còn nút hủy",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "E04_ready.png"
+  ],
+  "expected": "PAID → PREPARING → READY → COMPLETED hiển thị trong ≤ 6 giây mỗi bước",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946291250,
+  "ms": 11395
+ },
+ {
+  "id": "E05",
+  "cat": "E. Đơn hàng: lịch sử, chi tiết, hủy, trạng thái",
+  "title": "Khách không được hủy đơn khi đã vào pha chế",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Không có nút Hủy đơn khi PREPARING",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "API hủy đơn đang pha chế → 409",
+    "ok": true,
+    "actual": "409"
+   }
+  ],
+  "shots": [],
+  "expected": "Ẩn nút Hủy ở PREPARING; API trả 409",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946302646,
+  "ms": 675
+ },
+ {
+  "id": "E06",
+  "cat": "E. Đơn hàng: lịch sử, chi tiết, hủy, trạng thái",
+  "title": "Hủy đơn đã thanh toán: điểm thưởng có bị thu hồi?",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Sau khi trả tiền được cộng điểm",
+    "ok": true,
+    "actual": "11"
+   },
+   {
+    "desc": "Hủy đơn PAID thành công",
+    "ok": true,
+    "actual": "201"
+   },
+   {
+    "desc": "Điểm được thu hồi sau khi hủy (về 0)",
+    "ok": true,
+    "actual": "trước hủy 11 → sau hủy 0"
+   }
+  ],
+  "shots": [],
+  "expected": "Hủy đơn PAID thì điểm đã cộng phải được trừ lại (không \"mua rồi hủy\" để gom điểm)",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946303321,
+  "ms": 128
+ },
+ {
+  "id": "F01",
+  "cat": "F. Tồn kho và dữ liệu thay đổi",
+  "title": "Đặt vượt tồn kho trên giao diện",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện thông báo hết hàng/không đủ",
+    "ok": true,
+    "actual": "Bạc xỉu không đủ hàng (còn 3)"
+   },
+   {
+    "desc": "Giỏ còn nguyên",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Kho không đổi (3)",
+    "ok": true,
+    "actual": "3"
+   },
+   {
+    "desc": "Không tạo đơn",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "F01_oos.png"
+  ],
+  "expected": "Báo hết hàng, giỏ giữ nguyên, kho không đổi, không tạo đơn",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946303449,
+  "ms": 777
+ },
+ {
+  "id": "F02",
+  "cat": "F. Tồn kho và dữ liệu thay đổi",
+  "title": "Hai khách cùng mua ly cuối cùng trên giao diện (2 trình duyệt đồng thời)",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Đúng 1 người thanh toán thành công",
+    "ok": true,
+    "actual": "1 thành công"
+   },
+   {
+    "desc": "Người còn lại nhận lỗi",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Kho = 0, không âm",
+    "ok": true,
+    "actual": "0"
+   },
+   {
+    "desc": "Người thua thấy thông báo hết hàng",
+    "ok": true,
+    "actual": "Trà vải không đủ hàng (còn 0)"
+   }
+  ],
+  "shots": [
+   "F02_loser.png"
+  ],
+  "expected": "Đúng 1 người đặt được, người kia nhận thông báo hết hàng, kho = 0",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946304226,
+  "ms": 3548
+ },
+ {
+  "id": "F03",
+  "cat": "F. Tồn kho và dữ liệu thay đổi",
+  "title": "Vòng đời tồn kho: tạo đơn trừ, thanh toán lỗi giữ, hủy hoàn",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Tạo đơn PENDING trừ kho (−5)",
+    "ok": true,
+    "actual": "95"
+   },
+   {
+    "desc": "Thanh toán lỗi vẫn giữ kho",
+    "ok": true,
+    "actual": "95"
+   },
+   {
+    "desc": "Thanh toán thành công không trừ thêm",
+    "ok": true,
+    "actual": "95"
+   },
+   {
+    "desc": "Hủy → hoàn đủ kho",
+    "ok": true,
+    "actual": "100"
+   },
+   {
+    "desc": "Hủy lần 2 bị chặn (409), kho không cộng lần hai",
+    "ok": true,
+    "actual": "409, kho 100"
+   }
+  ],
+  "shots": [],
+  "expected": "Kho đúng ở từng bước",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946307774,
+  "ms": 509
+ },
+ {
+  "id": "F04",
+  "cat": "F. Tồn kho và dữ liệu thay đổi",
+  "title": "Giá thay đổi sau khi khách đã bỏ món vào giỏ",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Hiện cảnh báo giá đã thay đổi kèm tổng mới",
+    "ok": true,
+    "actual": "Giá một số món đã thay đổi so với giỏ hàng. Tổng mới của đơn: 100.000đ. Vui lòng kiểm tra rồi bấm xác nhận để thanh toán."
+   },
+   {
+    "desc": "Chưa trừ tiền: đơn vẫn PENDING",
+    "ok": true,
+    "actual": "PENDING"
+   },
+   {
+    "desc": "Tổng hiển thị đã cập nhật đúng giá mới (100.000đ)",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Sau khi khách xác nhận, số tiền trả = số tiền đã thấy",
+    "ok": true,
+    "actual": "100.000đ"
+   },
+   {
+    "desc": "Chỉ 1 đơn",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [
+   "F04_warning.png",
+   "F04_confirm.png"
+  ],
+  "expected": "Khách KHÔNG bị trừ tiền ở giá mới khi chưa được thấy: hệ thống dừng, báo giá mới, chờ xác nhận lại",
+  "status": "PASS",
+  "notes": [
+   "Giỏ hiển thị 70.000đ, giá thật trên server là 100.000đ"
+  ],
+  "t0": 1794946308283,
+  "ms": 984
+ },
+ {
+  "id": "F05",
+  "cat": "F. Tồn kho và dữ liệu thay đổi",
+  "title": "Món đã sold-out sau khi nằm trong giỏ",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Báo hết hàng",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Giỏ còn",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Báo lỗi rõ khi thanh toán, giỏ giữ nguyên",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946309267,
+  "ms": 713
+ },
+ {
+  "id": "G01",
+  "cat": "G. Bảo mật và kiểm tra dữ liệu đầu vào (API)",
+  "title": "Xác thực và phân quyền",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "GET /orders/me không token → 401",
+    "ok": true,
+    "actual": "401"
+   },
+   {
+    "desc": "POST /orders không token → 401",
+    "ok": true,
+    "actual": "401"
+   },
+   {
+    "desc": "POST /payments không token → 401",
+    "ok": true,
+    "actual": "401"
+   },
+   {
+    "desc": "GET /auth/me không token → 401",
+    "ok": true,
+    "actual": "401"
+   },
+   {
+    "desc": "Token sai → 401",
+    "ok": true,
+    "actual": "401"
+   },
+   {
+    "desc": "CUSTOMER đổi trạng thái pha chế → 403",
+    "ok": true,
+    "actual": "403"
+   },
+   {
+    "desc": "STAFF đặt PAID bằng tay → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "Xem đơn người khác → 403",
+    "ok": true,
+    "actual": "403"
+   },
+   {
+    "desc": "Thanh toán đơn người khác bị chặn (400/403/404)",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "Hủy đơn người khác → 403",
+    "ok": true,
+    "actual": "403"
+   },
+   {
+    "desc": "/auth/me không lộ mật khẩu/hash",
+    "ok": true,
+    "actual": "{\"id\":119,\"email\":\"u247745_34@test.vn\",\"name\":\"Tester\",\"role\":\"CUSTOMER\",\"loyaltyPoints\":0}"
+   },
+   {
+    "desc": "Đăng nhập không trả hash mật khẩu",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Không token/sai token → 401; khách đổi trạng thái → 403; staff đặt PAID tay → 400",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946309980,
+  "ms": 306
+ },
+ {
+  "id": "G02",
+  "cat": "G. Bảo mật và kiểm tra dữ liệu đầu vào (API)",
+  "title": "Kiểm tra dữ liệu tạo đơn (validation)",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "giỏ rỗng → 400/404",
+    "ok": true,
+    "actual": "400 [\"Giỏ hàng trống\"]"
+   },
+   {
+    "desc": "qty = 0 → 400/404",
+    "ok": true,
+    "actual": "400 [\"items.0.qty must not be less than 1\"]"
+   },
+   {
+    "desc": "qty âm → 400/404",
+    "ok": true,
+    "actual": "400 [\"items.0.qty must not be less than 1\"]"
+   },
+   {
+    "desc": "qty 21 → 400/404",
+    "ok": true,
+    "actual": "400 [\"items.0.qty must not be greater than 20\"]"
+   },
+   {
+    "desc": "qty số lẻ 1.5 → 400/404",
+    "ok": true,
+    "actual": "400 [\"items.0.Số lượng phải là số nguyên\"]"
+   },
+   {
+    "desc": "qty là chữ → 400/404",
+    "ok": true,
+    "actual": "400 [\"items.0.qty must not be greater than 20\",\"items.0.qty must not be le"
+   },
+   {
+    "desc": "size XL → 400/404",
+    "ok": true,
+    "actual": "400 [\"items.0.Size phải là S, M hoặc L\"]"
+   },
+   {
+    "desc": "productId không tồn tại → 400/404",
+    "ok": true,
+    "actual": "400 \"Sản phẩm #9999 không tồn tại\""
+   },
+   {
+    "desc": "productId âm → 400/404",
+    "ok": true,
+    "actual": "400 [\"items.0.productId must not be less than 1\"]"
+   },
+   {
+    "desc": "thêm trường unitPrice → 400/404",
+    "ok": true,
+    "actual": "400 [\"items.0.property unitPrice should not exist\"]"
+   },
+   {
+    "desc": "thêm trường total ở đơn → 400/404",
+    "ok": true,
+    "actual": "400 [\"property total should not exist\"]"
+   },
+   {
+    "desc": "topping lạ FOO → 400/404",
+    "ok": true,
+    "actual": "400 \"Topping không hợp lệ: FOO\""
+   },
+   {
+    "desc": "topping không phải mảng → 400/404",
+    "ok": true,
+    "actual": "400 [\"items.0.toppings must be an array\"]"
+   },
+   {
+    "desc": "items không phải mảng → 400/404",
+    "ok": true,
+    "actual": "400 [\"items must contain no more than 50 elements\",\"Giỏ hàng trống\",\"items"
+   },
+   {
+    "desc": "thiếu items → 400/404",
+    "ok": true,
+    "actual": "400 [\"items must contain no more than 50 elements\",\"Giỏ hàng trống\",\"items"
+   },
+   {
+    "desc": "51 dòng → 400/404",
+    "ok": true,
+    "actual": "400 [\"items must contain no more than 50 elements\"]"
+   },
+   {
+    "desc": "couponCode quá dài → 400/404",
+    "ok": true,
+    "actual": "400 [\"couponCode must be shorter than or equal to 40 characters\"]"
+   },
+   {
+    "desc": "JSON hỏng → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "Không tạo đơn nào từ các request sai",
+    "ok": true,
+    "actual": "0"
+   }
+  ],
+  "shots": [],
+  "expected": "Mọi dữ liệu sai bị từ chối 400, không 500",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946310286,
+  "ms": 130
+ },
+ {
+  "id": "G03",
+  "cat": "G. Bảo mật và kiểm tra dữ liệu đầu vào (API)",
+  "title": "Tính giá phía server: topping trùng, không tin giá client, đơn nhiều dòng",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Topping lặp tính 1 lần: tổng 128.000đ",
+    "ok": true,
+    "actual": "[201,128000]"
+   },
+   {
+    "desc": "Đơn nhiều dòng (gồm cùng món lặp) tính đúng",
+    "ok": true,
+    "actual": "[201,117000]"
+   }
+  ],
+  "shots": [],
+  "expected": "Giá server đúng công thức, topping lặp chỉ tính 1 lần",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946310416,
+  "ms": 116
+ },
+ {
+  "id": "G04",
+  "cat": "G. Bảo mật và kiểm tra dữ liệu đầu vào (API)",
+  "title": "Kiểm tra dữ liệu thanh toán và idempotency",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Thiếu Idempotency-Key → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "Key dài 129 ký tự → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "method = CASH (tiền mặt) → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "orderId = 0 → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "orderId = -5 → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "orderId = 1.5 → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "orderId = \"abc\" → 400",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "Đơn không tồn tại → 400/404",
+    "ok": true,
+    "actual": "400"
+   },
+   {
+    "desc": "Thanh toán đúng → 200/201",
+    "ok": true,
+    "actual": "201"
+   },
+   {
+    "desc": "Dùng lại key cho ĐƠN KHÁC → 409",
+    "ok": true,
+    "actual": "409"
+   },
+   {
+    "desc": "Trả lại đơn đã PAID bằng key mới → 409",
+    "ok": true,
+    "actual": "409"
+   },
+   {
+    "desc": "Trả tiền đơn đã hủy → 409",
+    "ok": true,
+    "actual": "409"
+   },
+   {
+    "desc": "6 request đồng thời cùng key trên đơn đã PAID: không 500",
+    "ok": true,
+    "actual": "409,409,409,409,409,409"
+   }
+  ],
+  "shots": [],
+  "expected": "Thiếu/quá dài key, method sai, đơn đã xong/đã hủy, key dùng cho đơn khác",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946310533,
+  "ms": 190
+ },
+ {
+  "id": "G05",
+  "cat": "G. Bảo mật và kiểm tra dữ liệu đầu vào (API)",
+  "title": "Thanh toán đồng thời 8 request, 8 key khác nhau cho cùng 1 đơn",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Đúng 1 thanh toán thành công",
+    "ok": true,
+    "actual": "409,409,201,409,409,409,409,409"
+   },
+   {
+    "desc": "Không có lỗi 500",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Chỉ 1 giao dịch SUCCESS trong CSDL",
+    "ok": true,
+    "actual": ""
+   },
+   {
+    "desc": "Điểm cộng đúng 1 lần",
+    "ok": true,
+    "actual": "11"
+   }
+  ],
+  "shots": [],
+  "expected": "Chỉ 1 giao dịch thành công, điểm chỉ cộng 1 lần",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946310723,
+  "ms": 232
+ },
+ {
+  "id": "G06",
+  "cat": "G. Bảo mật và kiểm tra dữ liệu đầu vào (API)",
+  "title": "Đặt hàng đồng thời: 30 khách mua sản phẩm còn 10",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Đúng 10 đơn thành công",
+    "ok": true,
+    "actual": "10 thành công, 20 bị 409, khác: không"
+   },
+   {
+    "desc": "Kho = 0",
+    "ok": true,
+    "actual": "0"
+   },
+   {
+    "desc": "Không có 500",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Đúng 10 đơn thành công, kho 0, không âm, không 500",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946310955,
+  "ms": 2314
+ },
+ {
+  "id": "G07",
+  "cat": "G. Bảo mật và kiểm tra dữ liệu đầu vào (API)",
+  "title": "CORS và header phản hồi",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Origin localhost:3000 được phép",
+    "ok": true,
+    "actual": "http://localhost:3000"
+   },
+   {
+    "desc": "Origin lạ không được cấp CORS",
+    "ok": true,
+    "actual": "null"
+   }
+  ],
+  "shots": [],
+  "expected": "Chỉ cho phép origin của frontend",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946313269,
+  "ms": 5
+ },
+ {
+  "id": "H01",
+  "cat": "H. Giao diện di động và độ ổn định",
+  "title": "Giao diện điện thoại (375×812): không tràn ngang trên mọi trang chính",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Trang menu: không tràn ngang",
+    "ok": true,
+    "actual": "scrollWidth 375 / 375"
+   },
+   {
+    "desc": "Trang chi-tiet: không tràn ngang",
+    "ok": true,
+    "actual": "scrollWidth 375 / 375"
+   },
+   {
+    "desc": "Trang gio: không tràn ngang",
+    "ok": true,
+    "actual": "scrollWidth 375 / 375"
+   },
+   {
+    "desc": "Trang thanh-toan: không tràn ngang",
+    "ok": true,
+    "actual": "scrollWidth 375 / 375"
+   },
+   {
+    "desc": "Trang lich-su: không tràn ngang",
+    "ok": true,
+    "actual": "scrollWidth 375 / 375"
+   },
+   {
+    "desc": "Trang don: không tràn ngang",
+    "ok": true,
+    "actual": "scrollWidth 375 / 375"
+   },
+   {
+    "desc": "Trang dang-nhap: không tràn ngang",
+    "ok": true,
+    "actual": "scrollWidth 375 / 375"
+   },
+   {
+    "desc": "Trang dang-ky: không tràn ngang",
+    "ok": true,
+    "actual": "scrollWidth 375 / 375"
+   }
+  ],
+  "shots": [
+   "H01_menu.png",
+   "H01_gio.png",
+   "H01_thanh-toan.png"
+  ],
+  "expected": "scrollWidth ≤ chiều rộng màn hình",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946313274,
+  "ms": 8925
+ },
+ {
+  "id": "H02",
+  "cat": "H. Giao diện di động và độ ổn định",
+  "title": "Bàn phím: Enter để đăng nhập; Tab đi qua form theo thứ tự",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Enter gửi form đăng nhập",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Enter gửi form",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946322199,
+  "ms": 596
+ },
+ {
+  "id": "H03",
+  "cat": "H. Giao diện di động và độ ổn định",
+  "title": "Lỗi console trình duyệt khi đi qua các trang chính",
+  "steps": [],
+  "checks": [
+   {
+    "desc": "Không có lỗi console đáng kể",
+    "ok": true,
+    "actual": ""
+   }
+  ],
+  "shots": [],
+  "expected": "Không có lỗi JavaScript / hydration",
+  "status": "PASS",
+  "notes": [],
+  "t0": 1794946322795,
+  "ms": 9047
+ }
+]

@@ -40,4 +40,13 @@ export class PromotionsService {
     await m.increment(User, { id: order.userId }, 'loyaltyPoints', points);
     return points;
   }
+
+  /** Thu hồi điểm đã cộng khi đơn đã thanh toán bị hủy (chỉ thu hồi một lần, không để điểm âm). */
+  async revokePoints(m: EntityManager, order: Order): Promise<number> {
+    const points = pointsFor(order.total);
+    const flag = await m.update(Order, { id: order.id, pointsAwarded: true }, { pointsAwarded: false });
+    if (flag.affected !== 1 || points <= 0) return 0;
+    await m.query('UPDATE users SET "loyaltyPoints" = GREATEST("loyaltyPoints" - $1, 0) WHERE id = $2', [points, order.userId]);
+    return points;
+  }
 }

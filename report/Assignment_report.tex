@@ -143,7 +143,7 @@ BrewLite là ứng dụng web cho phép khách hàng xem menu, chọn đồ uố
 
 \begin{itemize}
   \item \textbf{Kết quả:} hoàn thành đủ 10/10 task, đạt Definition of Done (Mục~\ref{sec:dod}). Luồng end-to-end chọn sản phẩm $\to$ giỏ hàng $\to$ đăng nhập $\to$ thanh toán $\to$ xác nhận đơn chạy được từ trình duyệt.
-  \item \textbf{Kiểm thử:} 33 test tự động (11 unit + 22 integration trên PostgreSQL thật) đều đạt; ba tiêu chí chấm của Task 10 (chặn chuyển trạng thái sai, idempotent, không bán vượt tồn kho) đều có test chứng minh (Mục~\ref{sec:test}).
+  \item \textbf{Kiểm thử:} 34 test tự động (11 unit + 23 integration trên PostgreSQL thật) đều đạt; ba tiêu chí chấm của Task 10 (chặn chuyển trạng thái sai, idempotent, không bán vượt tồn kho) đều có test chứng minh (Mục~\ref{sec:test}).
   \item \textbf{Bàn giao:} mã nguồn Git, \texttt{docker-compose.yml} chạy cả 3 dịch vụ (frontend, backend, DB), README hướng dẫn chạy (Mục~\ref{sec:handover}).
 \end{itemize}
 
@@ -522,7 +522,7 @@ Mỗi task hoàn thành (đạt Definition of Done ở Mục~\ref{sec:dod}) đư
 7 & Đăng ký / Đăng nhập (JWT) & \texttt{/auth/register}, \texttt{/auth/login}; bcrypt; phát JWT; guard bảo vệ route đặt đơn. & 3 & 2 & \footnotesize \texttt{auth/*}; test ``Task 7'' \\ \hline
 8 & Thanh toán không tiền mặt & Mock payment, chọn Ví/Thẻ, \texttt{POST /payments}; \st{PAID} khi thành công, \st{PAYMENT\_FAILED} khi lỗi. & 3 & 3 & \footnotesize \texttt{payments.service.ts}, \texttt{mock-gateway.ts}; test ``Task 8'' \\ \hline
 9 & Xác nhận, lịch sử đơn và bàn giao & Màn hình xác nhận (mã đơn, trạng thái), \texttt{GET /orders/me}; docker-compose chạy 3 dịch vụ; README; demo end-to-end. & 3 & 3 & \footnotesize \texttt{app/orders/*}, \texttt{docker-compose.yml}, \texttt{README.md} \\ \hline
-10 & Nghiệp vụ backend & State Machine, thanh toán idempotent, tồn kho đồng thời, khuyến mãi/loyalty (Mục~\ref{sec:task10}). & 8 & 3 & \footnotesize \texttt{order-status.ts}, \texttt{stock.service.ts}, \texttt{promotions.service.ts}; 33 test \\ \hline
+10 & Nghiệp vụ backend & State Machine, thanh toán idempotent, tồn kho đồng thời, khuyến mãi/loyalty (Mục~\ref{sec:task10}). & 8 & 3 & \footnotesize \texttt{order-status.ts}, \texttt{stock.service.ts}, \texttt{promotions.service.ts}; 34 test \\ \hline
 \multicolumn{3}{|r|}{\textbf{Tổng}} & \textbf{33} & & \textbf{10/10 task hoàn thành} \\ \hline
 \caption{Product Backlog và trạng thái hoàn thành}
 \end{longtable}
@@ -607,7 +607,7 @@ Mã giảm giá được kiểm tra: tồn tại, còn hoạt động, chưa h�
 
 %%%%%%%%%%%%%%%%%%%% 10. KIỂM THỬ %%%%%%%%%%%%%%%%%%%%
 \section{Kết quả kiểm thử}\label{sec:test}
-Chạy bằng \texttt{npm run test:all} trong \texttt{backend/} (PostgreSQL 16 thật, schema được tạo mới mỗi lần): \textbf{3 test suite, 33 test, tất cả đạt}; chạy lặp 3 lần liên tiếp đều ổn định.
+Chạy bằng \texttt{npm run test:all} trong \texttt{backend/} (PostgreSQL 16 thật, schema được tạo mới mỗi lần): \textbf{3 test suite, 34 test, tất cả đạt}; chạy lặp 3 lần liên tiếp đều ổn định.
 
 \subsection{Ba tiêu chí chấm của Task 10}
 \begin{table}[h!]
@@ -637,13 +637,13 @@ Task 8 -- Thanh toán (3) & Thành công $\to$ \st{PAID}; thiếu key 400; lỗi
 Task 10.1 -- State machine (3) & Chặn chuyển sai qua API; phân quyền nhân viên; hủy đơn hoàn kho. & 3/3 đạt \\ \hline
 Task 10.2 -- Idempotent (4) & Đơn lặp tuần tự và đồng thời; thanh toán lặp/đồng thời; dùng key cho đơn khác 409. & 4/4 đạt \\ \hline
 Task 10.3 -- Tồn kho (3) & 12 khách tranh 5 sản phẩm; mua nhiều số lượng; rollback khi thiếu giữa chừng. & 3/3 đạt \\ \hline
-Task 10.4 -- Khuyến mãi (2) & Áp mã, cộng điểm chỉ khi PAID; từ chối mã không hợp lệ. & 2/2 đạt \\ \hline
-\multicolumn{2}{|r|}{\textbf{Tổng}} & \textbf{33/33 đạt} \\ \hline
-\caption{Tổng hợp 33 test tự động}
+Task 10.4 -- Khuyến mãi (3) & Áp mã, cộng điểm chỉ khi PAID, thu hồi điểm khi hủy đơn đã thanh toán; từ chối mã không hợp lệ. & 3/3 đạt \\ \hline
+\multicolumn{2}{|r|}{\textbf{Tổng}} & \textbf{34/34 đạt} \\ \hline
+\caption{Tổng hợp 34 test tự động}
 \end{longtable}
 
 \subsection{Kiểm thử giao diện end-to-end}
-Kịch bản Playwright (Chromium) trên bản build production: mở Menu (8 sản phẩm) $\to$ chọn Cappuccino size L + trân châu (giá hiển thị 57.000đ) $\to$ thêm giỏ $\to$ thêm Trà đào (size M) $\to$ giỏ (2 dòng, tổng 96.000đ) $\to$ bấm Thanh toán khi chưa đăng nhập (chuyển \texttt{/login}) $\to$ đăng ký $\to$ thanh toán \textbf{lỗi} có mã \texttt{BREW10} (đơn \st{PAYMENT\_FAILED}, giỏ còn 2 dòng) $\to$ thử lại thành công $\to$ màn hình xác nhận (mã đơn \#1, \st{PAID}, tổng 86.400đ sau giảm 9.600đ, cộng 8 điểm, giỏ rỗng) $\to$ lịch sử đơn (1 đơn). Không có lỗi JavaScript ngoài phản hồi 402 có chủ đích.
+Kịch bản Playwright (Chromium) trên bản build production: mở Menu (8 sản phẩm) $\to$ chọn Cappuccino size L + trân châu (giá hiển thị 57.000đ) $\to$ thêm giỏ $\to$ thêm Trà đào (size M) $\to$ giỏ (2 dòng, tổng 96.000đ) $\to$ bấm Thanh toán khi chưa đăng nhập (chuyển \texttt{/login}) $\to$ đăng ký $\to$ thanh toán \textbf{lỗi} có mã \texttt{BREW10} (đơn \st{PAYMENT\_FAILED}, giỏ còn 2 dòng) $\to$ thử lại thành công $\to$ màn hình xác nhận (mã đơn \#1, \st{PAID}, tổng 86.400đ sau giảm 9.600đ, cộng 8 điểm, giỏ rỗng) $\to$ lịch sử đơn (1 đơn). Không có lỗi JavaScript ngoài phản hồi 402 có chủ đích. Ngoài ra một bộ 55 kịch bản giao diện chạy qua Playwright (224 điểm kiểm tra, đối chiếu cả cơ sở dữ liệu) đã phát hiện và giúp sửa 6 lỗi nghiệp vụ; chi tiết ở tài liệu riêng \texttt{docs/BrewLite\_Bao\_cao\_kiem\_thu.pdf}.
 
 %%%%%%%%%%%%%%%%%%%% 11. DoD %%%%%%%%%%%%%%%%%%%% 
 \section{Definition of Done}\label{sec:dod}

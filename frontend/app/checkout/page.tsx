@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { api, ApiError, fmt, OrderView } from '@/lib/api';
 import { uuid } from '@/lib/uuid';
-import { cartTotal, useAuth, useCart, useMounted } from '@/lib/store';
+import { cartTotal, itemKey, useAuth, useCart, useMounted } from '@/lib/store';
 import { useRequireAuth } from '@/components/useRequireAuth';
 import { Empty, ErrorBox, Spinner } from '@/components/ui';
 
@@ -13,7 +13,7 @@ function Checkout() {
   const token = useRequireAuth();
   const router = useRouter();
   const retryId = useSearchParams().get('order');
-  const { items, clear } = useCart();
+  const { items } = useCart();
   const { logout, setUser } = useAuth();
 
   const [method, setMethod] = useState<'WALLET' | 'CARD'>('WALLET');
@@ -51,6 +51,12 @@ function Checkout() {
           },
         });
         setOrder(current);
+        // Giá server là giá cuối cùng: nếu khác giá trong giỏ thì dừng lại để khách xác nhận lại, KHÔNG tự trừ tiền
+        if (current.subtotal !== cartTotal(items)) {
+          setError(`Giá một số món đã thay đổi so với giỏ hàng. Tổng mới của đơn: ${fmt(current.total)}. Vui lòng kiểm tra rồi bấm xác nhận để thanh toán.`);
+          router.replace(`/checkout?order=${current.id}`);
+          return;
+        }
       }
       const res = await api<any>('/payments', {
         token, headers: { 'Idempotency-Key': payKey.current },
@@ -58,8 +64,14 @@ function Checkout() {
       });
       payKey.current = uuid(); // phản hồi dứt khoát → lần thử sau dùng key mới
       setOrder(res.order);
-      if (!res.success) { setError(`${res.message}. Giỏ hàng được giữ nguyên, bạn có thể thử lại.`); return; }
-      if (!retryId) clear();
+      if (!res.success) {
+        setError(`${res.message}. Giỏ hàng được giữ nguyên, bạn có thể thử lại.`);
+        if (!retryId) router.replace(`/checkout?order=${current.id}`); // tải lại trang vẫn tiếp tục đúng đơn này, không tạo đơn mới
+        return;
+      }
+      // Dọn khỏi giỏ đúng những món vừa thanh toán (dù thanh toán từ giỏ hay từ trang "Thanh toán lại")
+      const paidKeys = new Set(current.items.map((i) => itemKey(i.productId, i.size, i.toppings)));
+      useCart.getState().items.filter((i) => paidKeys.has(i.key)).forEach((i) => useCart.getState().remove(i.key));
       api('/auth/me', { token }).then(setUser).catch(() => {});
       router.push(`/orders/${current.id}?paid=1`);
     } catch (e) {

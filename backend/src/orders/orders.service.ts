@@ -110,6 +110,7 @@ export class OrdersService {
       const wanted = new Map<number, number>();
       for (const i of items) wanted.set(i.productId, (wanted.get(i.productId) ?? 0) + i.qty);
       await this.stock.release(m, wanted);
+      await this.promos.revokePoints(m, order); // hủy đơn đã thanh toán → thu hồi điểm thưởng
     }
     await m.update(Order, { id: order.id }, { status: to });
     order.status = to;

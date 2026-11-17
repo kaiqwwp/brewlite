@@ -244,6 +244,17 @@ describe('BrewLite API (e2e)', () => {
       await ctx.http().post('/payments').set(auth(u.token)).set('Idempotency-Key', 'ls').send({ orderId: o.body.id, method: 'CARD' }).expect(201);
       expect((await ctx.http().get('/auth/me').set(auth(u.token))).body.loyaltyPoints).toBe(18);
     });
+    it('hủy đơn đã thanh toán thu hồi đúng số điểm đã cộng (một lần), không để điểm âm', async () => {
+      const u = await registerUser(ctx);
+      const p = await createProduct(ctx, 10, 50000);
+      const o = await ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(p.id, 2)] }).expect(201);
+      await ctx.http().post('/payments').set(auth(u.token)).set('Idempotency-Key', 'rv1').send({ orderId: o.body.id, method: 'WALLET' }).expect(201);
+      expect((await ctx.http().get('/auth/me').set(auth(u.token))).body.loyaltyPoints).toBe(10);
+      await ctx.http().post(`/orders/${o.body.id}/cancel`).set(auth(u.token)).expect(201);
+      expect((await ctx.http().get('/auth/me').set(auth(u.token))).body.loyaltyPoints).toBe(0);
+      await ctx.http().post(`/orders/${o.body.id}/cancel`).set(auth(u.token)).expect(409); // hủy lần hai không trừ thêm
+      expect((await ctx.http().get('/auth/me').set(auth(u.token))).body.loyaltyPoints).toBe(0);
+    });
     it('từ chối mã không tồn tại / hết hạn / chưa đủ đơn tối thiểu', async () => {
       await createCoupon(ctx, { code: 'OLD', percentOff: 10, expiresAt: new Date('2020-01-01') });
       await createCoupon(ctx, { code: 'BIG', percentOff: 10, minTotal: 500000 });

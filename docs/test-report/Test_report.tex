@@ -1,0 +1,629 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Liberation Serif}\setsansfont{Liberation Sans}\setmonofont{DejaVu Sans Mono}[Scale=0.85]
+\usepackage{float,array,longtable,booktabs,graphicx,xcolor,colortbl,enumitem,fancyhdr,hyperref,caption,subcaption,lastpage}
+\hypersetup{colorlinks=true,linkcolor=brown!60!black,urlcolor=blue!50!black}
+\definecolor{brew}{rgb}{0.435,0.271,0.153}\definecolor{okgreen}{rgb}{0.1,0.55,0.3}\definecolor{warnred}{rgb}{0.75,0.15,0.15}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\setlist[itemize]{leftmargin=1.2em,itemsep=0pt,topsep=1pt,parsep=0pt}
+\pagestyle{fancy}\fancyhf{}\lhead{\small BrewLite -- Báo cáo kiểm thử giao diện}\rhead{\small Lâm Sơn Hùng -- 3123560031}\cfoot{\small Trang \thepage/\pageref{LastPage}}
+\setlength{\fboxsep}{0pt}\addtolength{\fboxrule}{-0.2pt}\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\newcommand{\ok}{\textcolor{okgreen}{\textbf{PASS}}}
+\newfontfamily\tickfont{DejaVu Sans}\newcommand{\tick}{\textcolor{okgreen}{{\tickfont ✓}}}\newcommand{\shot}[2][]{\fbox{\includegraphics[#1]{#2}}}
+\begin{document}
+\begin{center}
+{\Large\bfseries\color{brew} BÁO CÁO KIỂM THỬ GIAO DIỆN VÀ NGHIỆP VỤ}\\[3pt]
+{\large Dự án BrewLite -- Ứng dụng đặt đồ uống (NestJS + Next.js + PostgreSQL)}\\[3pt]
+Sinh viên: Lâm Sơn Hùng -- MSSV 3123560031 -- Giảng viên: Từ Lãng Phiêu\\
+Môn: Công nghệ phần mềm -- Trường Đại học Sài Gòn
+\end{center}
+
+\section{Mục đích và phương pháp}
+Mục tiêu: kiểm tra \textbf{lỗi nghiệp vụ} (không chỉ lỗi hiển thị) khi đi qua giao diện như một khách hàng thật, và đánh giá hệ thống đã \textbf{đáp ứng yêu cầu} của 10 task hay chưa.
+\begin{itemize}
+\item \textbf{Công cụ}: Playwright điều khiển Chromium thật (không giả lập API); khách hàng thao tác trên trang Next.js, backend NestJS và PostgreSQL 16 chạy thật.
+\item \textbf{Kiểm tra kép}: sau mỗi thao tác giao diện, kịch bản đối chiếu lại với \textbf{cơ sở dữ liệu} (số đơn, trạng thái, tồn kho, điểm thưởng, số giao dịch thanh toán), vì giao diện đúng chưa chắc dữ liệu đúng.
+\item \textbf{Mô phỏng sự cố}: ngắt mạng đúng lúc nhận phản hồi, bấm liên tục, hai trình duyệt cùng mua ly cuối, giá thay đổi khi khách đang xem giỏ, token hỏng, tải lại trang giữa chừng.
+\item \textbf{Quy trình}: chạy $\to$ ghi lỗi $\to$ sửa mã nguồn $\to$ chạy lại toàn bộ. Số liệu trong báo cáo là của lần chạy cuối sau khi sửa lỗi.
+\item \textbf{Ngoài giao diện}: bộ kiểm thử tự động phía backend (Jest) cũng được chạy lại sau khi sửa: 34/34 đạt.
+\end{itemize}
+
+\section{Tổng quan kết quả}
+\begin{longtable}{|L{7cm}|c|c|c|}\hline\textbf{Nhóm kiểm thử}&\textbf{Kịch bản}&\textbf{Điểm kiểm tra}&\textbf{Kết quả}\\\hline\endhead
+A. Menu và chi tiết sản phẩm&8&25&8/8 \ok\\\hline
+B. Giỏ hàng&5&16&5/5 \ok\\\hline
+C. Tài khoản và phân quyền giao diện&9&21&9/9 \ok\\\hline
+D. Thanh toán và mã giảm giá&12&56&12/12 \ok\\\hline
+E. Đơn hàng: lịch sử, chi tiết, hủy, trạng thái&6&21&6/6 \ok\\\hline
+F. Tồn kho và dữ liệu thay đổi&5&20&5/5 \ok\\\hline
+G. Bảo mật và kiểm tra dữ liệu đầu vào (API)&7&55&7/7 \ok\\\hline
+H. Giao diện di động và độ ổn định&3&10&3/3 \ok\\\hline
+\textbf{Tổng}&\textbf{55}&\textbf{224}&\textbf{55/55}\\\hline\end{longtable}
+Lượt chạy đầu tiên phát hiện \textbf{6 lỗi} (Mục~\ref{sec:bugs}); cả 6 đã được sửa và kiểm tra lại. Lượt chạy cuối: \textbf{55/55 kịch bản đạt, 224/224 điểm kiểm tra đạt}.
+
+\section{Lỗi nghiệp vụ đã phát hiện và sửa}\label{sec:bugs}
+Các lỗi dưới đây đều \textbf{không làm hỏng giao diện}, phần lớn chỉ lộ ra khi đối chiếu dữ liệu hoặc mô phỏng tình huống bất thường.
+\begin{longtable}{|L{0.9cm}|L{1.2cm}|L{3.3cm}|L{3.9cm}|L{4.0cm}|}\hline
+\textbf{Mã}&\textbf{Mức}&\textbf{Hiện tượng (trước khi sửa)}&\textbf{Hậu quả nghiệp vụ}&\textbf{Cách sửa và kết quả chạy lại}\\\hline\endhead
+\textbf{F04}&Cao&Giá sản phẩm đổi trên server sau khi khách đã bỏ món vào giỏ; trang thanh toán vẫn đi tiếp.&Khách bị trừ số tiền khác với số tiền đã thấy trong giỏ (giỏ 70.000đ, thực tế 100.000đ).&Thanh toán: so sánh tổng đơn của server với tổng trong giỏ; lệch thì dừng, chưa trả tiền, hiện cảnh báo kèm tổng mới, khách bấm xác nhận lần hai. Chạy lại: đạt.\\\hline
+\textbf{D11}&Trung bình&Thanh toán lỗi rồi tải lại trang và bấm thanh toán lại.&Sinh ra đơn thứ hai; đơn lỗi cũ vẫn giữ kho (tồn kho bị trừ thừa 2 ly).&Khi lỗi, địa chỉ chuyển sang \texttt{/checkout?order=ID} nên thử lại dùng lại đúng đơn cũ. Chạy lại: 1 đơn, kho trừ một lần.\\\hline
+\textbf{D12}&Trung bình&Thanh toán lại thành công từ trang chi tiết đơn.&Giỏ hàng vẫn còn nguyên món đã mua, khách có thể mua trùng.&Sau khi trả tiền chỉ xóa các dòng giỏ khớp với món trong đơn (không xóa món khác khách vừa thêm). Chạy lại: đạt.\\\hline
+\textbf{E06}&Trung bình&Khách hủy đơn đã thanh toán.&Điểm thưởng đã cộng không bị thu hồi: có thể mua rồi hủy để tích điểm.&Thêm \texttt{revokePoints} (dùng cờ \texttt{pointsAwarded} nên hủy hai lần không trừ hai lần). Thêm test tích hợp, backend 34/34. Chạy lại: điểm về 0.\\\hline
+\textbf{C07}&Thấp&Token hết hạn hoặc bị hỏng khi đang dùng.&Giao diện vẫn hiện như đã đăng nhập, mọi thao tác báo lỗi lặp lại, khách không biết phải đăng nhập lại.&Nhận 401 thì tự đăng xuất và chuyển về \texttt{/login}, sau đăng nhập quay lại đúng trang. Chạy lại: đạt.\\\hline
+\textbf{G07}&Thấp&Không đặt \texttt{CORS\_ORIGIN} thì máy chủ chấp nhận mọi nguồn gốc.&Cấu hình mặc định quá lỏng cho môi trường thật.&Mặc định chỉ cho phép \texttt{http://localhost:3000}; cấu hình thật vẫn đặt bằng biến môi trường. Chạy lại: đạt.\\\hline
+\end{longtable}
+
+\begin{figure}[H]\centering
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/F04_warning.png}\caption{F04: cảnh báo giá đã thay đổi, chưa trừ tiền}\end{subfigure}\hfill
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/E03_cancelled.png}\caption{E03/E06: đơn đã hủy}\end{subfigure}
+\caption{Minh họa hai kịch bản liên quan lỗi đã sửa}\end{figure}
+
+\section{Chi tiết kịch bản theo nhóm}
+Mỗi kịch bản gồm \emph{kỳ vọng} và các \emph{điểm kiểm tra} (dấu \tick{} là đạt; phần sau dấu hai chấm là giá trị thực tế ghi nhận khi chạy, nếu có).
+\subsection{A. Menu và chi tiết sản phẩm}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{A01}} -- \textbf{Menu hiển thị đủ 8 sản phẩm kèm tên, giá, ảnh} \hfill \ok\\
+{\small\emph{Kỳ vọng:} 8 thẻ sản phẩm, đúng tên và giá, ảnh tải được}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Số sản phẩm = 8: 8
+\item \tick "Cà phê sữa" hiển thị giá 35.000đ: Cà phê sữa |  | 35.000đ
+\item \tick "Americano" hiển thị giá 40.000đ: Americano |  | 40.000đ
+\item \tick "Cappuccino" hiển thị giá 45.000đ: Cappuccino |  | 45.000đ
+\item \tick "Trà đào" hiển thị giá 39.000đ: Trà đào |  | 39.000đ
+\item \tick "Latte" hiển thị giá 45.000đ: Latte |  | 45.000đ
+\item \tick "Bạc xỉu" hiển thị giá 38.000đ: Bạc xỉu |  | 38.000đ
+\item \tick "Trà vải" hiển thị giá 39.000đ: Trà vải |  | 39.000đ
+\item \tick "Matcha đá xay" hiển thị giá 55.000đ: Matcha đá xay |  | 55.000đ
+\item \tick Mọi ảnh sản phẩm tải được: 0 ảnh lỗi
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{A02}} -- \textbf{Lỗi mạng khi tải menu: hiện thông báo và nút Thử lại hoạt động} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Hiện hộp lỗi + Thử lại; sau khi mạng ổn bấm Thử lại thì menu hiện}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện thông báo lỗi kết nối: Không kết nối được máy chủ. Vui lòng thử lại.
+
+Thử lại
+\item \tick Thử lại thành công, menu hiện
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{A03}} -- \textbf{Menu trống hiển thị trạng thái rỗng} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Hiện "Menu đang trống"}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện trạng thái rỗng
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{A04}} -- \textbf{Trang chi tiết: giá mặc định (size M), đổi size S/M/L} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Giá = giá gốc + chênh lệch size (S −5k, M 0, L +7k)}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Mặc định size M = 45.000đ
+\item \tick Size S = 40.000đ: 40000
+\item \tick Size L = 52.000đ: 52000
+\item \tick Size M = 45.000đ: 45000
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{A05}} -- \textbf{Giá theo mọi tổ hợp size × topping (48 tổ hợp) cho Cappuccino} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Giá hiển thị khớp công thức server cho từng tổ hợp}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Cả 48 tổ hợp đều đúng giá
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{A06}} -- \textbf{Số lượng ở trang chi tiết: tối thiểu 1, tối đa 20, giá nhân theo số lượng} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Không giảm dưới 1, không tăng quá 20, tạm tính = đơn giá × số lượng}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Giảm ở 1 vẫn là 1
+\item \tick Tăng 25 lần dừng ở 20
+\item \tick Tạm tính = 20 × 35.000đ
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{A07}} -- \textbf{Sản phẩm không tồn tại / id sai} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Thông báo "Không tìm thấy sản phẩm", không trang trắng}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick /products/9999 báo không tìm thấy: Không tìm thấy sản phẩm.
+\item \tick /products/abc hiện lỗi dễ hiểu (không crash): Validation failed (numeric string is expected)
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{A08}} -- \textbf{Sản phẩm hết hàng: menu báo "Hết hàng", nút thêm giỏ bị vô hiệu} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Menu có nhãn Hết hàng; nút "Hết hàng" disabled}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Menu có nhãn Hết hàng
+\item \tick Nút bị vô hiệu
+\end{itemize}
+\subsection{B. Giỏ hàng}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{B01}} -- \textbf{Thêm vào giỏ: badge đếm đúng, cùng cấu hình gộp dòng, khác size tách dòng} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Cùng món/size/topping cộng dồn; khác size là dòng riêng; badge = tổng số lượng}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Badge = 1
+\item \tick Thêm lại cùng cấu hình → badge 2
+\item \tick Có 2 dòng (L+Trân châu ×2 và M ×1): 2
+\item \tick Tổng = 159.000đ
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{B02}} -- \textbf{Giỏ hàng: tăng, giảm, giảm về 0 thì xóa dòng, nút Xóa, Xóa tất cả} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Tổng cập nhật đúng sau mỗi thao tác; giỏ rỗng hiện trạng thái trống}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Tổng ban đầu đúng: 121000
+\item \tick Tăng món 1 → 3 ly
+\item \tick Giảm còn 1 ly
+\item \tick Giảm về 0 thì dòng bị xóa
+\item \tick Xóa dòng cuối → giỏ trống
+\item \tick "Xóa tất cả" làm trống giỏ
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{B03}} -- \textbf{Giỏ hàng được lưu qua lần tải lại trang (localStorage/Zustand persist)} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Reload vẫn còn sản phẩm và badge}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Còn 1 dòng sau reload
+\item \tick Badge vẫn là 2
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{B04}} -- \textbf{Giới hạn 20 ly mỗi dòng khi cộng dồn trong giỏ} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Không vượt 20}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Tăng ở 20 vẫn là 20: 20
+\item \tick Thêm 5 ly vào dòng đã có 20 → vẫn 20: 20
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{B05}} -- \textbf{Thanh toán khi giỏ trống / vào /checkout trực tiếp} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Không tạo đơn rỗng; hiện giỏ trống}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện "Giỏ hàng trống"
+\item \tick API từ chối giỏ rỗng (400): 400
+\end{itemize}
+\subsection{C. Tài khoản và phân quyền giao diện}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{C01}} -- \textbf{Đăng ký tài khoản mới trên giao diện} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Đăng ký xong tự đăng nhập, header hiện "Đơn của tôi", điểm 0}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Header hiện điểm tích lũy 0
+\item \tick Về trang chủ sau đăng ký: http://localhost:3000/
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{C02}} -- \textbf{Đăng ký trùng email} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Báo lỗi email đã tồn tại, không đăng nhập}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện lỗi trùng email: Email đã được đăng ký
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{C03}} -- \textbf{Kiểm tra dữ liệu đăng ký: mật khẩu ngắn, email sai (UI và API)} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Giao diện chặn; API trả 400}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Mật khẩu 3 ký tự bị chặn ở form (vẫn ở /register)
+\item \tick API: mật khẩu 5 ký tự → 400: 400
+\item \tick API: email sai định dạng → 400: 400
+\item \tick API: gửi thêm trường role=STAFF bị từ chối (chống leo quyền): 400
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{C04}} -- \textbf{Đăng nhập sai mật khẩu / email không tồn tại} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Báo lỗi, không đăng nhập; thông báo không lộ email có tồn tại hay không}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Cả hai trường hợp đều báo lỗi: Sai email hoặc mật khẩu | Sai email hoặc mật khẩu
+\item \tick Hai thông báo giống nhau (không lộ email tồn tại): Sai email hoặc mật khẩu | Sai email hoặc mật khẩu
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{C05}} -- \textbf{Đăng nhập, tải lại vẫn giữ phiên, đăng xuất xóa phiên} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Phiên lưu qua reload; đăng xuất ẩn "Đơn của tôi"}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Reload vẫn đăng nhập
+\item \tick Đăng xuất thành công
+\item \tick Sau đăng xuất, /orders chuyển về /login?next=/orders
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{C06}} -- \textbf{Trang cần đăng nhập chuyển hướng rồi quay lại đúng trang sau khi đăng nhập} \hfill \ok\\
+{\small\emph{Kỳ vọng:} /orders và /checkout redirect; đăng nhập xong về đúng next}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Thanh toán khi chưa đăng nhập → /login?next=/checkout
+\item \tick Đăng nhập xong quay về /checkout, giỏ còn nguyên
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{C07}} -- \textbf{Token hỏng / hết hạn khi đang dùng} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Không treo giao diện; người dùng được đưa về đăng nhập hoặc thấy lỗi rõ ràng}
+\\{\small\emph{Ghi chú:} /orders với token hỏng: url=http://localhost:3000/login?next=\%2Forders, nội dung=" BrewLite Đăng nhập  Giỏ hàng 1 Đăng nhập Email Mật khẩu Đăng nhập  Chưa có tài khoản? Đăng ký  BrewLite – Bài tập lớ"}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick /orders với token hỏng/hết hạn tự đăng xuất và chuyển về /login?next=/orders
+\item \tick Checkout với token hỏng → logout + về /login: http://localhost:3000/login?next=/checkout
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{C08}} -- \textbf{Email viết hoa/thường và khoảng trắng khi đăng nhập} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Đăng nhập không phân biệt hoa thường email}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Đăng nhập với email VIẾT HOA thành công (email thường không phân biệt hoa thường): 200
+\item \tick Đăng ký lại cùng email khác hoa thường bị từ chối (409): 409
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{C09}} -- \textbf{Chuỗi nguy hiểm trong tên và email (XSS, SQL injection)} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Không chạy script, không lỗi 500, không lộ dữ liệu}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick SQLi ở login → 400/401 (không 500, không đăng nhập): 400
+\item \tick Đăng ký tên chứa HTML được chấp nhận hoặc từ chối an toàn: 201
+\item \tick Tên chứa HTML không thực thi script
+\end{itemize}
+\subsection{D. Thanh toán và mã giảm giá}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D01}} -- \textbf{Luồng chính: thanh toán ví điện tử thành công} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Đơn PAID, mã đơn hiển thị, giỏ rỗng, header cộng điểm (96.000đ → 9 điểm)}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Giỏ 96.000đ
+\item \tick Mặc định chọn Ví điện tử
+\item \tick Trạng thái PAID
+\item \tick Có mã đơn: Mã đơn: \#52
+\item \tick Tiêu đề "Đặt hàng thành công"
+\item \tick Giỏ hàng được xóa
+\item \tick Điểm trên header = 9: 
+BrewLite
+Đơn của tôi
+ 9 điểm
+Đăng xuất
+ Giỏ hàng
+0
+\item \tick Điểm trên server khớp
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D02}} -- \textbf{Thanh toán bằng thẻ ngân hàng} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Chọn Thẻ ngân hàng → PAID}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick PAID
+\item \tick Phương thức lưu là CARD: CARD
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D03}} -- \textbf{Mã BREW10 trên giao diện: giảm 10\%, hiển thị ở checkout và xác nhận} \hfill \ok\\
+{\small\emph{Kỳ vọng:} 96.000đ → giảm 9.600đ → 86.400đ, 8 điểm}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện dòng giảm giá BREW10 −9.600đ
+\item \tick Tổng 86.400đ
+\item \tick Cộng 8 điểm: 8
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D04}} -- \textbf{Ma trận mã giảm giá (BREW10, WELCOME20) theo giá trị đơn} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Đúng tỷ lệ, trần giảm, điều kiện đơn tối thiểu}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick BREW10, đơn 110.000đ → giảm 11.000đ: [201,11000,99000]
+\item \tick BREW10, đơn 330.000đ → giảm tối đa 20.000đ: [201,20000]
+\item \tick WELCOME20, đơn 90.000đ (\textless{}100k) → bị từ chối 400: 400 Đơn tối thiểu 100000đ để dùng mã WELCOME20
+\item \tick WELCOME20, đơn 110.000đ → giảm 22.000đ: [201,22000]
+\item \tick WELCOME20, đơn 330.000đ → giảm tối đa 50.000đ: [201,50000]
+\item \tick Mã không tồn tại → 400: 400
+\item \tick Mã viết thường "brew10" vẫn nhận: [201,3500]
+\item \tick Mã có khoảng trắng hai đầu vẫn nhận: [201,3500]
+\item \tick Mã chỉ toàn khoảng trắng không gây lỗi 500: 400
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D05}} -- \textbf{Mã giảm giá sai trên giao diện: báo lỗi, giữ giỏ, không tạo đơn} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Hiện lỗi rõ ràng; giỏ còn; 0 đơn được tạo}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện thông báo mã không hợp lệ: Mã giảm giá không hợp lệ
+\item \tick Giỏ vẫn còn
+\item \tick Chưa tạo đơn nào
+\item \tick Sửa mã đúng rồi thanh toán được
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D06}} -- \textbf{Thanh toán lỗi: giữ giỏ, giữ đơn, thử lại thành công, điểm chỉ cộng một lần} \hfill \ok\\
+{\small\emph{Kỳ vọng:} PAYMENT\_FAILED → thử lại → PAID; đúng 1 đơn; điểm cộng 1 lần}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện lỗi và nói giỏ được giữ: Thanh toán bị từ chối (mô phỏng). Giỏ hàng được giữ nguyên, bạn có thể thử lại.
+\item \tick Giỏ còn nguyên
+\item \tick Có 1 đơn trạng thái PAYMENT\_FAILED: ["PAYMENT\_FAILED"]
+\item \tick Kho vẫn đang giữ cho đơn (−2): 98
+\item \tick Chưa có điểm
+\item \tick Thử lại → PAID
+\item \tick Vẫn chỉ 1 đơn (không tạo đơn mới khi thử lại): 1
+\item \tick Điểm cộng đúng 1 lần = 9: 9
+\item \tick Số giao dịch thanh toán của đơn = 2 (1 lỗi + 1 thành công): 2
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D07}} -- \textbf{Thanh toán lỗi rồi hủy đơn: kho được hoàn lại} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Đơn CANCELLED, kho về như ban đầu}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Kho bị giữ (−3): 97
+\item \tick Đơn CANCELLED
+\item \tick Kho hoàn lại: 100
+\item \tick Nút Hủy/Thanh toán biến mất sau khi hủy
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D08}} -- \textbf{Bấm "Xác nhận thanh toán" liên tục (double / triple click)} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Chỉ 1 đơn và 1 giao dịch thành công}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Chỉ 1 đơn được tạo: 1
+\item \tick Điểm không bị cộng nhiều lần: 3
+\item \tick Chỉ 1 giao dịch SUCCESS
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D09}} -- \textbf{Mất kết nối ĐÚNG LÚC nhận phản hồi thanh toán, rồi bấm lại} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Không trừ tiền hai lần: 1 giao dịch SUCCESS, điểm 1 lần, đơn PAID}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện lỗi kết nối, giỏ còn: Không kết nối được máy chủ. Vui lòng thử lại.
+\item \tick Phía server đơn đã PAID (thanh toán đã xử lý): PAID
+\item \tick Bấm lại → thấy PAID
+\item \tick Chỉ 1 giao dịch SUCCESS (idempotent)
+\item \tick Điểm cộng 1 lần: 7
+\item \tick Chỉ 1 đơn
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D10}} -- \textbf{Mất kết nối ĐÚNG LÚC nhận phản hồi tạo đơn, rồi bấm lại} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Không tạo đơn trùng (Idempotency-Key tạo đơn)}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Server đã tạo 1 đơn dù client không nhận được phản hồi
+\item \tick Sau khi bấm lại vẫn chỉ 1 đơn: 1
+\item \tick Kho chỉ trừ 1 lần: 99
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D11}} -- \textbf{Tải lại trang sau khi thanh toán lỗi rồi thanh toán lại} \hfill \ok\\
+{\small\emph{Kỳ vọng:} KHÔNG để lại đơn mồ côi giữ kho; chỉ 1 đơn cho 1 giỏ hàng}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Chỉ 1 đơn cho 1 giỏ hàng (không có đơn PAYMENT\_FAILED mồ côi): 1 đơn: PAID
+\item \tick Kho chỉ bị trừ cho 1 đơn (−2), không bị giữ thừa: kho còn 98 / ban đầu 100
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{D12}} -- \textbf{Thanh toán lại từ trang chi tiết đơn (link "Thanh toán lại")} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Sau khi trả tiền thành công, giỏ hàng cũ được dọn (không mua trùng)}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Đơn PAID
+\item \tick Giỏ hàng được xóa sau khi trả tiền cho đơn đó: giỏ còn 0 dòng
+\item \tick Badge giỏ về 0: 0
+\end{itemize}
+\subsection{E. Đơn hàng: lịch sử, chi tiết, hủy, trạng thái}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{E01}} -- \textbf{Lịch sử đơn: trạng thái rỗng, thứ tự mới nhất trước, cô lập giữa người dùng} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Người mới chưa có đơn; chỉ thấy đơn của mình; đơn mới ở trên}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Trạng thái rỗng
+\item \tick Có đúng 2 đơn của mình (không lẫn đơn người khác): 2
+\item \tick Đơn mới nhất ở trên cùng: Đơn \#70  03:11:27 18/11/2026 · 2 món  108.000đ  Đã thanh toán
+\item \tick Hiện trạng thái PAID cho đơn đã trả và "Chờ thanh toán" cho đơn chưa trả
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{E02}} -- \textbf{Truy cập đơn của người khác / đơn không tồn tại / id sai trên giao diện} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Báo lỗi dễ hiểu, không lộ dữ liệu}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Đơn người khác → báo không phải đơn của bạn: Không phải đơn của bạn
+
+Thử lại
+\item \tick Không lộ mã/giá của đơn người khác
+\item \tick Đơn không tồn tại → báo không tìm thấy
+\item \tick Id không phải số → lỗi có kiểm soát (không 500): Validation failed (numeric string is expected)
+
+Thử lại
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{E03}} -- \textbf{Hủy đơn đã thanh toán: hộp xác nhận, hoàn kho; chọn "Hủy" ở hộp thoại thì giữ nguyên} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Accept → CANCELLED + kho hoàn; Dismiss → đơn không đổi}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Từ chối hộp thoại → vẫn PAID
+\item \tick Xác nhận → CANCELLED
+\item \tick Kho hoàn lại +4: 96→100
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{E04}} -- \textbf{Trạng thái pha chế do nhân viên cập nhật hiện lên trang đơn (tự làm mới)} \hfill \ok\\
+{\small\emph{Kỳ vọng:} PAID → PREPARING → READY → COMPLETED hiển thị trong ≤ 6 giây mỗi bước}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Nhân viên đặt PREPARING → 200
+\item \tick Trang đơn tự cập nhật sang PREPARING: 5306ms
+\item \tick Nhân viên đặt READY → 200
+\item \tick Trang đơn tự cập nhật sang READY: 4799ms
+\item \tick COMPLETED hiển thị, không còn nút hủy
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{E05}} -- \textbf{Khách không được hủy đơn khi đã vào pha chế} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Ẩn nút Hủy ở PREPARING; API trả 409}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Không có nút Hủy đơn khi PREPARING
+\item \tick API hủy đơn đang pha chế → 409: 409
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{E06}} -- \textbf{Hủy đơn đã thanh toán: điểm thưởng có bị thu hồi?} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Hủy đơn PAID thì điểm đã cộng phải được trừ lại (không "mua rồi hủy" để gom điểm)}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Sau khi trả tiền được cộng điểm: 11
+\item \tick Hủy đơn PAID thành công: 201
+\item \tick Điểm được thu hồi sau khi hủy (về 0): trước hủy 11 → sau hủy 0
+\end{itemize}
+\subsection{F. Tồn kho và dữ liệu thay đổi}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{F01}} -- \textbf{Đặt vượt tồn kho trên giao diện} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Báo hết hàng, giỏ giữ nguyên, kho không đổi, không tạo đơn}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện thông báo hết hàng/không đủ: Bạc xỉu không đủ hàng (còn 3)
+\item \tick Giỏ còn nguyên
+\item \tick Kho không đổi (3): 3
+\item \tick Không tạo đơn
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{F02}} -- \textbf{Hai khách cùng mua ly cuối cùng trên giao diện (2 trình duyệt đồng thời)} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Đúng 1 người đặt được, người kia nhận thông báo hết hàng, kho = 0}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Đúng 1 người thanh toán thành công: 1 thành công
+\item \tick Người còn lại nhận lỗi
+\item \tick Kho = 0, không âm: 0
+\item \tick Người thua thấy thông báo hết hàng: Trà vải không đủ hàng (còn 0)
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{F03}} -- \textbf{Vòng đời tồn kho: tạo đơn trừ, thanh toán lỗi giữ, hủy hoàn} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Kho đúng ở từng bước}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Tạo đơn PENDING trừ kho (−5): 95
+\item \tick Thanh toán lỗi vẫn giữ kho: 95
+\item \tick Thanh toán thành công không trừ thêm: 95
+\item \tick Hủy → hoàn đủ kho: 100
+\item \tick Hủy lần 2 bị chặn (409), kho không cộng lần hai: 409, kho 100
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{F04}} -- \textbf{Giá thay đổi sau khi khách đã bỏ món vào giỏ} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Khách KHÔNG bị trừ tiền ở giá mới khi chưa được thấy: hệ thống dừng, báo giá mới, chờ xác nhận lại}
+\\{\small\emph{Ghi chú:} Giỏ hiển thị 70.000đ, giá thật trên server là 100.000đ}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Hiện cảnh báo giá đã thay đổi kèm tổng mới
+\item \tick Chưa trừ tiền: đơn vẫn PENDING: PENDING
+\item \tick Tổng hiển thị đã cập nhật đúng giá mới (100.000đ)
+\item \tick Sau khi khách xác nhận, số tiền trả = số tiền đã thấy: 100.000đ
+\item \tick Chỉ 1 đơn
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{F05}} -- \textbf{Món đã sold-out sau khi nằm trong giỏ} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Báo lỗi rõ khi thanh toán, giỏ giữ nguyên}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Báo hết hàng
+\item \tick Giỏ còn
+\end{itemize}
+\subsection{G. Bảo mật và kiểm tra dữ liệu đầu vào (API)}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{G01}} -- \textbf{Xác thực và phân quyền} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Không token/sai token → 401; khách đổi trạng thái → 403; staff đặt PAID tay → 400}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick GET /orders/me không token → 401: 401
+\item \tick POST /orders không token → 401: 401
+\item \tick POST /payments không token → 401: 401
+\item \tick GET /auth/me không token → 401: 401
+\item \tick Token sai → 401: 401
+\item \tick CUSTOMER đổi trạng thái pha chế → 403: 403
+\item \tick STAFF đặt PAID bằng tay → 400: 400
+\item \tick Xem đơn người khác → 403: 403
+\item \tick Thanh toán đơn người khác bị chặn (400/403/404): 400
+\item \tick Hủy đơn người khác → 403: 403
+\item \tick /auth/me không lộ mật khẩu/hash
+\item \tick Đăng nhập không trả hash mật khẩu
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{G02}} -- \textbf{Kiểm tra dữ liệu tạo đơn (validation)} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Mọi dữ liệu sai bị từ chối 400, không 500}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick giỏ rỗng → 400/404: 400 ["Giỏ hàng trống"]
+\item \tick qty = 0 → 400/404: 400 ["items.0.qty must not be less than 1"]
+\item \tick qty âm → 400/404: 400 ["items.0.qty must not be less than 1"]
+\item \tick qty 21 → 400/404: 400 ["items.0.qty must not be greater than 20"]
+\item \tick qty số lẻ 1.5 → 400/404: 400 ["items.0.Số lượng phải là số nguyên"]
+\item \tick qty là chữ → 400/404: 400 ["items.0.qty must not be greater than 20","items.0.qty must not be le
+\item \tick size XL → 400/404: 400 ["items.0.Size phải là S, M hoặc L"]
+\item \tick productId không tồn tại → 400/404: 400 "Sản phẩm \#9999 không tồn tại"
+\item \tick productId âm → 400/404: 400 ["items.0.productId must not be less than 1"]
+\item \tick thêm trường unitPrice → 400/404: 400 ["items.0.property unitPrice should not exist"]
+\item \tick thêm trường total ở đơn → 400/404: 400 ["property total should not exist"]
+\item \tick topping lạ FOO → 400/404: 400 "Topping không hợp lệ: FOO"
+\item \tick topping không phải mảng → 400/404: 400 ["items.0.toppings must be an array"]
+\item \tick items không phải mảng → 400/404: 400 ["items must contain no more than 50 elements","Giỏ hàng trống","items
+\item \tick thiếu items → 400/404: 400 ["items must contain no more than 50 elements","Giỏ hàng trống","items
+\item \tick 51 dòng → 400/404: 400 ["items must contain no more than 50 elements"]
+\item \tick couponCode quá dài → 400/404: 400 ["couponCode must be shorter than or equal to 40 characters"]
+\item \tick JSON hỏng → 400: 400
+\item \tick Không tạo đơn nào từ các request sai: 0
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{G03}} -- \textbf{Tính giá phía server: topping trùng, không tin giá client, đơn nhiều dòng} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Giá server đúng công thức, topping lặp chỉ tính 1 lần}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Topping lặp tính 1 lần: tổng 128.000đ: [201,128000]
+\item \tick Đơn nhiều dòng (gồm cùng món lặp) tính đúng: [201,117000]
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{G04}} -- \textbf{Kiểm tra dữ liệu thanh toán và idempotency} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Thiếu/quá dài key, method sai, đơn đã xong/đã hủy, key dùng cho đơn khác}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Thiếu Idempotency-Key → 400: 400
+\item \tick Key dài 129 ký tự → 400: 400
+\item \tick method = CASH (tiền mặt) → 400: 400
+\item \tick orderId = 0 → 400: 400
+\item \tick orderId = -5 → 400: 400
+\item \tick orderId = 1.5 → 400: 400
+\item \tick orderId = "abc" → 400: 400
+\item \tick Đơn không tồn tại → 400/404: 400
+\item \tick Thanh toán đúng → 200/201: 201
+\item \tick Dùng lại key cho ĐƠN KHÁC → 409: 409
+\item \tick Trả lại đơn đã PAID bằng key mới → 409: 409
+\item \tick Trả tiền đơn đã hủy → 409: 409
+\item \tick 6 request đồng thời cùng key trên đơn đã PAID: không 500: 409,409,409,409,409,409
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{G05}} -- \textbf{Thanh toán đồng thời 8 request, 8 key khác nhau cho cùng 1 đơn} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Chỉ 1 giao dịch thành công, điểm chỉ cộng 1 lần}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Đúng 1 thanh toán thành công: 409,409,201,409,409,409,409,409
+\item \tick Không có lỗi 500
+\item \tick Chỉ 1 giao dịch SUCCESS trong CSDL
+\item \tick Điểm cộng đúng 1 lần: 11
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{G06}} -- \textbf{Đặt hàng đồng thời: 30 khách mua sản phẩm còn 10} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Đúng 10 đơn thành công, kho 0, không âm, không 500}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Đúng 10 đơn thành công: 10 thành công, 20 bị 409, khác: không
+\item \tick Kho = 0: 0
+\item \tick Không có 500
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{G07}} -- \textbf{CORS và header phản hồi} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Chỉ cho phép origin của frontend}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Origin localhost:3000 được phép: http://localhost:3000
+\item \tick Origin lạ không được cấp CORS: null
+\end{itemize}
+\subsection{H. Giao diện di động và độ ổn định}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{H01}} -- \textbf{Giao diện điện thoại (375×812): không tràn ngang trên mọi trang chính} \hfill \ok\\
+{\small\emph{Kỳ vọng:} scrollWidth ≤ chiều rộng màn hình}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Trang menu: không tràn ngang: scrollWidth 375 / 375
+\item \tick Trang chi-tiet: không tràn ngang: scrollWidth 375 / 375
+\item \tick Trang gio: không tràn ngang: scrollWidth 375 / 375
+\item \tick Trang thanh-toan: không tràn ngang: scrollWidth 375 / 375
+\item \tick Trang lich-su: không tràn ngang: scrollWidth 375 / 375
+\item \tick Trang don: không tràn ngang: scrollWidth 375 / 375
+\item \tick Trang dang-nhap: không tràn ngang: scrollWidth 375 / 375
+\item \tick Trang dang-ky: không tràn ngang: scrollWidth 375 / 375
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{H02}} -- \textbf{Bàn phím: Enter để đăng nhập; Tab đi qua form theo thứ tự} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Enter gửi form}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Enter gửi form đăng nhập
+\end{itemize}
+\begin{minipage}{\textwidth}\vspace{4pt}\textbf{\textcolor{brew}{H03}} -- \textbf{Lỗi console trình duyệt khi đi qua các trang chính} \hfill \ok\\
+{\small\emph{Kỳ vọng:} Không có lỗi JavaScript / hydration}
+\end{minipage}
+\begin{itemize}\footnotesize
+\item \tick Không có lỗi console đáng kể
+\end{itemize}
+\section{Ảnh chụp màn hình tiêu biểu}
+\begin{figure}[H]\centering
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/A01_menu.png}\caption{Menu 8 sản phẩm (A01)}\end{subfigure}\hfill
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/A04_detail.png}\caption{Chi tiết, đổi size (A04)}\end{subfigure}\\[6pt]
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/B01_cart.png}\caption{Giỏ hàng (B01)}\end{subfigure}\hfill
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/D03_coupon.png}\caption{Mã BREW10 (D03)}\end{subfigure}\\[6pt]
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/D06_failed.png}\caption{Thanh toán lỗi, giữ giỏ (D06)}\end{subfigure}\hfill
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/D01_confirm.png}\caption{Xác nhận đơn (D01)}\end{subfigure}\\[6pt]
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/F02_loser.png}\caption{Hai khách tranh ly cuối (F02)}\end{subfigure}\hfill
+\begin{subfigure}{0.46\textwidth}\shot[width=\textwidth]{shots/E04_ready.png}\caption{Trạng thái pha chế (E04)}\end{subfigure}\\[6pt]
+\caption{Ảnh chụp tự động từ lượt chạy cuối (còn 39 ảnh trong thư mục \texttt{shots/})}\end{figure}
+\begin{figure}[H]\centering
+\shot[height=7cm]{shots/H01_menu.png}\hspace{4pt}\shot[height=7cm]{shots/H01_gio.png}\hspace{4pt}\shot[height=7cm]{shots/H01_thanh-toan.png}
+\caption{Giao diện điện thoại 375×812 (H01): không tràn ngang}\end{figure}
+
+\section{Đối chiếu yêu cầu: 10 task}
+\begin{longtable}{|L{0.6cm}|L{3cm}|L{6.2cm}|L{1.2cm}|L{2.4cm}|}\hline
+\textbf{\#}&\textbf{Task}&\textbf{Bằng chứng kiểm thử}&\textbf{Kết luận}&\textbf{Ghi chú}\\\hline\endhead
+1&Khởi tạo dự án&Toàn bộ 55 kịch bản chạy trên bản build thật; backend 3001, frontend 3000, Postgres; README và Docker Compose.&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize Chưa chạy lại \texttt{docker compose} trong lượt này\\\hline
+2&API danh sách sản phẩm&A01, A07, A08, G03: danh sách, chi tiết, 404, hết hàng.&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize \\\hline
+3&Trang Menu&A01 (8 sản phẩm), A02 (lỗi mạng và thử lại), A03 (rỗng), A08 (hết hàng), H01 (di động).&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize \\\hline
+4&Chi tiết và tùy chọn&A04, A05 (48 tổ hợp size×topping), A06 (số lượng 1--20), G03 (server tự tính giá).&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize \\\hline
+5&Giỏ hàng&B01--B05: thêm, gộp dòng, tăng giảm xóa, lưu qua tải lại, giới hạn 20, giỏ trống; F04, F05.&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize Giỏ chung trên một trình duyệt\\\hline
+6&API tạo đơn&G02 (19 điểm kiểm tra), G03, G06 (30 khách tranh 10 sản phẩm), D10, F01.&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize \\\hline
+7&Đăng ký, đăng nhập (JWT)&C01--C09, G01: đăng ký, trùng email, dữ liệu sai, phiên, chuyển hướng, XSS và SQL injection, token hỏng.&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize JWT lưu \texttt{localStorage}\\\hline
+8&Thanh toán không tiền mặt&D01, D02 (ví, thẻ), D06, D08, D09, G04, G05: thành công, lỗi, thử lại, bấm liên tục, mất mạng.&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize Cổng thanh toán là mô phỏng\\\hline
+9&Xác nhận, lịch sử, bàn giao&D01, E01--E05: xác nhận đơn, lịch sử, chi tiết, cô lập giữa người dùng, hủy, cập nhật trạng thái.&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize Chưa có giao diện cho nhân viên\\\hline
+10&Nghiệp vụ backend&State machine (E03--E05, G01), idempotent (D08--D10, G04, G05), tồn kho đồng thời (F02, F03, G06), khuyến mãi và điểm (D03--D06, E06); 34 test backend.&\textcolor{okgreen}{\textbf{Đạt}}&\footnotesize Sau khi sửa E06, F04\\\hline
+\end{longtable}
+
+\section{Kết luận: đã đủ yêu cầu chưa?}
+\textbf{Về yêu cầu của đề}: đủ. Cả 10 task đều có bằng chứng kiểm thử cụ thể; luồng chính (xem menu $\to$ chọn tùy chọn $\to$ giỏ $\to$ đăng nhập $\to$ thanh toán $\to$ xác nhận $\to$ lịch sử) chạy đúng, và các yêu cầu khó của Task 10 (máy trạng thái, idempotent, tồn kho đồng thời, khuyến mãi) đều được kiểm chứng trên cả giao diện lẫn cơ sở dữ liệu.
+
+\textbf{Về chất lượng nghiệp vụ}: lượt kiểm thử đã tìm ra 6 lỗi, trong đó lỗi nặng nhất (F04: trừ tiền theo giá khách chưa thấy) chỉ lộ ra khi mô phỏng giá thay đổi. Cả 6 đã sửa và chạy lại toàn bộ.
+
+\textbf{Giới hạn đã biết (không nằm trong yêu cầu, nên ghi rõ để giảng viên không hiểu nhầm là đã làm):}
+\begin{itemize}
+\item Đơn \texttt{PENDING} không tự hết hạn nên có thể giữ kho vô thời hạn (cần một tác vụ định kỳ hủy đơn quá hạn).
+\item Giỏ hàng lưu theo trình duyệt, không theo tài khoản: hai người dùng chung một trình duyệt sẽ thấy cùng giỏ.
+\item Cổng thanh toán là bản mô phỏng; không có quy trình hoàn tiền khi khách hủy đơn đã thanh toán.
+\item Tồn kho tính theo sản phẩm, không theo nguyên liệu; chưa có giao diện quản trị cho nhân viên (cập nhật trạng thái qua API).
+\item JWT lưu trong \texttt{localStorage} (đơn giản nhưng kém an toàn hơn cookie \texttt{HttpOnly}).
+\item Chưa kiểm thử tải lớn, nhiều trình duyệt khác nhau (chỉ Chromium) và khả năng truy cập (accessibility) đầy đủ.
+\end{itemize}
+\end{document}

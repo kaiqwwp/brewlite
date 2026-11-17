@@ -1,3 +1,5 @@
+import { useAuth } from './store';
+
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export class ApiError extends Error {
@@ -22,6 +24,8 @@ export async function api<T = any>(path: string, opts: Opts = {}): Promise<T> {
   } catch {
     throw new ApiError(0, 'Không kết nối được máy chủ. Vui lòng thử lại.');
   }
+  // Token hết hạn/không hợp lệ: đăng xuất để giao diện đưa khách về trang đăng nhập (thay vì kẹt ở thông báo lỗi)
+  if (res.status === 401 && opts.token) useAuth.getState().logout();
   const text = await res.text();
   const data = text ? JSON.parse(text) : null;
   if (!res.ok && res.status !== 402) {
