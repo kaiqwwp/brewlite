@@ -1,0 +1,138 @@
+@startuml class-domain
+!include _style.iuml
+title Class-01 – Mô hình miền BrewLite (khớp entity TypeORM trong apps/api/src/entities)
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassHeaderBackgroundColor #F7F1EA
+skinparam ClassBorderColor #8A5A37
+hide empty methods
+
+enum Role <<enumeration>> {
+  CUSTOMER
+  STAFF
+}
+enum OrderStatus <<enumeration>> {
+  PENDING
+  PAID
+  PREPARING
+  READY
+  COMPLETED
+  PAYMENT_FAILED
+  CANCELLED
+}
+enum PaymentMethod <<enumeration>> {
+  WALLET
+  CARD
+}
+enum PaymentStatus <<enumeration>> {
+  SUCCESS
+  FAILED
+}
+enum LoyaltyType <<enumeration>> {
+  EARN
+  REVOKE
+}
+enum Size <<enumeration>> {
+  S «−5.000đ»
+  M «0đ»
+  L «+7.000đ»
+}
+
+class User {
+  +id: int «PK»
+  +email: string «unique»
+  +name: string
+  -passwordHash: string
+  +role: Role
+  +loyaltyPoints: int {≥ 0}
+  +createdAt: timestamptz
+}
+class Product {
+  +id: int «PK»
+  +name: string
+  +description: string
+  +price: int «VND, size M»
+  +imageUrl: string
+  +stock: int {≥ 0}
+  +version: int «optimistic lock»
+}
+class Order {
+  +id: int «PK»
+  +userId: int «FK»
+  +status: OrderStatus
+  +subtotal: int
+  +discount: int
+  +total: int
+  +couponCode: string [0..1] «FK»
+  +idempotencyKey: string [0..1]
+  +pointsAwarded: boolean
+  +createdAt: timestamptz
+  --
+  {unique (userId, idempotencyKey)}
+}
+class OrderItem {
+  +id: int «PK»
+  +orderId: int «FK»
+  +productId: int «FK»
+  +productName: string
+  +size: Size
+  +toppings: string[]
+  +qty: int {1..20}
+  +unitPrice: int
+  +lineTotal: int
+}
+class Payment {
+  +id: int «PK»
+  +orderId: int «FK»
+  +userId: int «FK»
+  +idempotencyKey: string «unique»
+  +amount: int
+  +method: PaymentMethod
+  +status: PaymentStatus
+  +reference: string [0..1]
+  +failureReason: string [0..1]
+  +createdAt: timestamptz
+}
+class Promotion {
+  +code: string «PK»
+  +percentOff: int
+  +minTotal: int
+  +maxDiscount: int [0..1]
+  +active: boolean
+  +expiresAt: timestamptz [0..1]
+}
+class LoyaltyTransaction {
+  +id: int «PK»
+  +userId: int «FK»
+  +orderId: int «FK»
+  +type: LoyaltyType
+  +points: int {> 0}
+  +createdAt: timestamptz
+  --
+  {unique (orderId, type)}
+}
+
+User "1" -- "0..*" Order : đặt >
+Order "1" *-- "1..*" OrderItem : gồm >
+OrderItem "0..*" --> "1" Product : tham chiếu >
+Order "1" -- "0..*" Payment : được thanh toán bởi >
+User "1" -- "0..*" Payment : thực hiện >
+Order "0..*" --> "0..1" Promotion : áp dụng >
+User "1" -- "0..*" LoyaltyTransaction : sổ điểm >
+Order "1" -- "0..2" LoyaltyTransaction : sinh ra >
+
+User ..> Role
+Order ..> OrderStatus
+OrderItem ..> Size
+Payment ..> PaymentMethod
+Payment ..> PaymentStatus
+LoyaltyTransaction ..> LoyaltyType
+
+note bottom of LoyaltyTransaction
+  EARN khi đơn → PAID, REVOKE khi hủy đơn đã PAID.
+  users.loyaltyPoints = Σ EARN − Σ REVOKE
+end note
+note right of Order
+  Chuyển trạng thái theo state machine
+  (FR-10, apps/api/src/orders/order-status.ts)
+end note
+@enduml

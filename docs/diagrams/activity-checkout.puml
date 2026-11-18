@@ -1,0 +1,98 @@
+@startuml activity-checkout
+!include _style.iuml
+title Activity-01 – Luồng end-to-end: xem menu → đặt đơn → thanh toán → theo dõi đơn
+skinparam ActivityBackgroundColor #F7F1EA
+skinparam ActivityBorderColor #8A5A37
+skinparam ActivityDiamondBackgroundColor #FFF3D6
+skinparam SwimlaneTitleFontStyle bold
+
+|#FFFFFF|Khách hàng|
+start
+:Mở BrewLite (PWA) trên điện thoại;
+|#F4F8FF|Next.js UI|
+:GET /products, hiển thị "Đang tải menu…";
+|#F3FBF3|NestJS API|
+:Trả danh sách sản phẩm;
+|Next.js UI|
+if (Tải menu?) then (lỗi)
+  :Hiện lỗi + nút "Thử lại";
+  |Khách hàng|
+  :Bấm "Thử lại";
+  detach
+else (thành công)
+endif
+|Khách hàng|
+repeat
+  :Chọn món, size S/M/L, topping;
+  |Next.js UI|
+  if (Sản phẩm còn hàng?) then (hết hàng)
+    :Vô hiệu nút "Thêm vào giỏ",\nhiện nhãn "Hết hàng";
+  else (còn)
+    :Tính giá một ly, thêm vào giỏ\n(gộp món trùng, lưu localStorage);
+  endif
+  |Khách hàng|
+repeat while (Chọn thêm món?) is (có)
+-> không;
+:Mở giỏ hàng, bấm "Thanh toán";
+|Next.js UI|
+if (Đã đăng nhập?) then (chưa)
+  :Chuyển /login?next=/checkout;
+  |Khách hàng|
+  :Đăng nhập hoặc đăng ký;
+  |NestJS API|
+  :Xác thực, cấp JWT;
+  |Next.js UI|
+else (rồi)
+endif
+|Khách hàng|
+:Chọn Ví điện tử / Thẻ,\n(tuỳ chọn) nhập mã giảm giá,\nbấm "Xác nhận thanh toán";
+|Next.js UI|
+:POST /orders + JWT + Idempotency-Key;
+|NestJS API|
+:Kiểm tra JWT, validate dữ liệu;
+if (Hợp lệ?) then (không)
+  :400 – thông báo lỗi cụ thể;
+  |Next.js UI|
+  :Hiện lỗi, khách sửa lại;
+  detach
+else (có)
+endif
+|NestJS API|
+:BEGIN; tính giá, áp mã giảm giá;
+:Giữ tồn kho (optimistic lock, thử lại ≤ 8 lần);
+if (Đủ tồn kho?) then (không)
+  :ROLLBACK, 409 OUT_OF_STOCK;
+  |Next.js UI|
+  :Báo món hết hàng, quay về giỏ;
+  detach
+else (đủ)
+endif
+|NestJS API|
+:Lưu đơn PENDING, COMMIT, 201;
+|Next.js UI|
+:POST /payments + Idempotency-Key;
+|NestJS API|
+:Khoá dòng đơn (SELECT … FOR UPDATE),\ngọi cổng thanh toán;
+if (Cổng thanh toán?) then (từ chối)
+  :Đơn → PAYMENT_FAILED,\nlưu payment FAILED, 402;
+  |Next.js UI|
+  :Hiện "Thanh toán thất bại",\ngiữ giỏ và đơn;
+  |Khách hàng|
+  if (Thử lại?) then (có)
+    :Thử lại với key mới\n(PAYMENT_FAILED → PENDING);
+    detach
+  else (không)
+    :Hủy đơn (hoàn kho);
+    stop
+  endif
+else (chấp nhận)
+  |NestJS API|
+  :Đơn → PAID, cộng điểm (LoyaltyTransaction EARN),\nlưu payment SUCCESS, COMMIT, 201;
+endif
+|Next.js UI|
+:Xoá món đã mua khỏi giỏ,\nchuyển /orders/:id;
+|Khách hàng|
+:Xem xác nhận "Đã thanh toán";
+:Theo dõi trạng thái PREPARING → READY\n(nhân viên cập nhật), nhận đồ tại quầy;
+stop
+@enduml

@@ -1,0 +1,91 @@
+@startuml sequence-checkout
+!include _style.iuml
+title Sequence-01 – UC-05 Đặt và thanh toán đơn hàng
+autonumber "<b>[00]"
+skinparam ParticipantBackgroundColor #F7F1EA
+skinparam ParticipantBorderColor #8A5A37
+skinparam SequenceGroupBorderColor #8A5A37
+skinparam SequenceLifeLineBorderColor #B79B82
+
+actor "Customer" as C
+participant "Next.js UI\n(apps/web)" as UI
+participant "NestJS API\n(apps/api)" as API
+database "Database\n(PostgreSQL)" as DB
+participant "Payment Service\n(MockPaymentGateway)" as PG
+
+C -> UI : Bấm "Xác nhận thanh toán"\n(phương thức, mã giảm giá)
+UI -> UI : orderKey = uuid(), payKey = uuid()
+
+== Tạo đơn (FR-05) ==
+UI -> API : POST /orders\nAuthorization: Bearer <JWT>\nIdempotency-Key: orderKey\n{items[], couponCode}
+API -> API : JwtAuthGuard kiểm tra chữ ký, hạn JWT
+alt JWT thiếu / sai / hết hạn
+  API --> UI : 401 Unauthorized
+  UI --> C : Đăng xuất, chuyển /login
+end
+API -> API : ValidationPipe (whitelist): size S/M/L,\nqty 1–20, giỏ không rỗng
+alt Dữ liệu không hợp lệ
+  API --> UI : 400 + danh sách lỗi
+  UI --> C : Hiện lỗi cụ thể
+end
+API -> DB : SELECT order WHERE userId, idempotencyKey = orderKey
+alt Key đã dùng (gửi lại)
+  DB --> API : Đơn đã tạo
+  API --> UI : 200 + Idempotent-Replayed: true (đơn cũ)
+else Key mới
+  API -> DB : BEGIN
+  API -> DB : SELECT products WHERE id IN (...)
+  API -> API : Đơn giá = giá gốc + size + topping;\ngiảm giá theo Promotion
+  loop mỗi sản phẩm (theo id tăng dần, thử lại ≤ 8 lần)
+    API -> DB : UPDATE products SET stock = stock - qty, version = version + 1\nWHERE id = ? AND version = ? AND stock >= qty
+    DB --> API : affected = 1 (hoặc 0 → đọc lại, thử lại)
+  end
+  alt Không đủ tồn kho
+    API -> DB : ROLLBACK
+    API --> UI : 409 OUT_OF_STOCK
+    UI --> C : "Sản phẩm … không đủ hàng"
+  else Đủ
+    API -> DB : INSERT orders (PENDING), order_items
+    API -> DB : COMMIT
+    API --> UI : 201 {id, subtotal, discount, total, status: PENDING}
+  end
+end
+UI -> UI : So subtotal với tổng giỏ (lệch → dừng, hỏi lại khách)
+
+== Thanh toán idempotent (FR-07) ==
+UI -> API : POST /payments\nAuthorization: Bearer <JWT>\nIdempotency-Key: payKey\n{orderId, method}
+API -> API : Kiểm tra JWT, validate {orderId, method ∈ WALLET|CARD}
+API -> DB : SELECT payment WHERE idempotencyKey = payKey
+alt Key đã xử lý (client gửi lại)
+  DB --> API : Payment cũ
+  API --> UI : 200/402 như lần đầu + Idempotent-Replayed: true\n(không gọi Payment Service lần hai)
+else Key mới
+  API -> DB : BEGIN
+  API -> DB : SELECT * FROM orders WHERE id = ? FOR UPDATE
+  note right of DB : Yêu cầu song song cho cùng đơn\nphải chờ khoá này
+  API -> DB : SELECT payment WHERE idempotencyKey = payKey (kiểm tra lại)
+  alt Đơn không ở PENDING / PAYMENT_FAILED
+    API -> DB : ROLLBACK
+    API --> UI : 409 ORDER_NOT_PAYABLE
+  else Đơn thanh toán được
+    API -> PG : charge(amount = total, method)
+    alt Thanh toán thành công
+      PG --> API : ok, reference
+      API -> DB : UPDATE orders SET status = PAID WHERE id = ? AND status = PENDING
+      API -> DB : INSERT loyalty_transactions (EARN), UPDATE users.loyaltyPoints
+      API -> DB : INSERT payments (SUCCESS, payKey UNIQUE)
+      API -> DB : COMMIT
+      API --> UI : 201 {status: SUCCESS, reference}
+      UI -> UI : Xoá món đã mua khỏi giỏ
+      UI --> C : Chuyển /orders/:id – "Đã thanh toán", mã đơn, tổng tiền
+    else Thanh toán thất bại
+      PG --> API : failed, reason
+      API -> DB : UPDATE orders SET status = PAYMENT_FAILED
+      API -> DB : INSERT payments (FAILED, payKey, reason)
+      API -> DB : COMMIT
+      API --> UI : 402 {status: FAILED, failureReason}
+      UI --> C : "Thanh toán thất bại", nút Thử lại (key mới) / Hủy đơn
+    end
+  end
+end
+@enduml
