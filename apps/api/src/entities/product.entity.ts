@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn, VersionColumn } from 'typeorm';
+import { Check, Column, Entity, PrimaryGeneratedColumn, VersionColumn } from 'typeorm';
 
 @Entity('products')
+@Check('CHK_products_stock_non_negative', '"stock" >= 0')
 export class Product {
   @PrimaryGeneratedColumn() id: number;
   @Column({ type: 'varchar' }) name: string;

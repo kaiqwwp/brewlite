@@ -1,7 +1,8 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('coupons')
-export class Coupon {
+/** Chương trình khuyến mãi theo mã (BREW10, WELCOME20...). Bảng `promotions`. */
+@Entity('promotions')
+export class Promotion {
   @PrimaryColumn({ type: 'varchar' }) code: string;
   @Column({ type: 'int' }) percentOff: number;
   @Column({ type: 'int', default: 0 }) minTotal: number;

@@ -1,0 +1,154 @@
+# CD: Push/Tag → Lint và Test → Build → Docker Image → Push Registry → Deploy → Smoke Test.
+# - Push vào main: triển khai production với image tag = commit SHA.
+# - Push tag vX.Y.Z: như trên, image có thêm tag phiên bản và tạo GitHub Release.
+# - Chạy tay (workflow_dispatch) với rollback_to=<SHA>: triển khai lại image cũ đã có trên GHCR.
+# Deploy thất bại hoặc smoke test không đạt: pipeline tự triển khai lại phiên bản trước rồi dừng với lỗi.
+name: CD
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      rollback_to:
+        description: "SHA (đầy đủ 40 ký tự) của image cần triển khai lại. Để trống = build và triển khai commit hiện tại."
+        required: false
+        default: ""
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  quality-gate:
+    if: github.event.inputs.rollback_to == ''
+    uses: ./.github/workflows/ci.yml
+
+  image:
+    name: build và push image ${{ matrix.app }}
+    needs: quality-gate
+    if: github.event.inputs.rollback_to == ''
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app: [api, web]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tên image (chữ thường)
+        id: name
+        run: echo "image=${REGISTRY}/${GITHUB_REPOSITORY_OWNER,,}/brewlite-${{ matrix.app }}" >> "$GITHUB_OUTPUT"
+      - name: Tag image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.name.outputs.image }}
+          tags: |
+            type=sha,format=long,prefix=
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build và push
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/${{ matrix.app }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+            NEXT_PUBLIC_API_URL=${{ vars.API_URL }}
+          cache-from: type=gha,scope=${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
+
+  deploy:
+    name: deploy production + smoke test
+    needs: image
+    if: always() && (needs.image.result == 'success' || github.event.inputs.rollback_to != '')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.WEB_URL }}
+    env:
+      API_URL: ${{ vars.API_URL }}
+      WEB_URL: ${{ vars.WEB_URL }}
+      API_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_API }}
+      WEB_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_WEB }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Kiểm tra cấu hình
+        run: |
+          for v in API_URL WEB_URL API_HOOK WEB_HOOK; do
+            if [ -z "${!v}" ]; then echo "::error::Thiếu $v (xem docs/deployment.md)"; exit 1; fi
+          done
+      - name: Xác định phiên bản mới và phiên bản đang chạy
+        id: ver
+        run: |
+          TARGET="${{ github.event.inputs.rollback_to }}"
+          [ -z "$TARGET" ] && TARGET="${GITHUB_SHA}"
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          CURRENT=$(curl -fsS --retry 3 --retry-delay 20 --max-time 90 "$API_URL/health" | node -pe 'JSON.parse(require("fs").readFileSync(0)).version' || echo "")
+          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "previous=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "owner=$OWNER" >> "$GITHUB_OUTPUT"
+          echo "Đang chạy: ${CURRENT:-không rõ} → triển khai: $TARGET" >> "$GITHUB_STEP_SUMMARY"
+      - name: Deploy API (migration chạy khi container khởi động)
+        run: |
+          IMG=$(node -e 'console.log(encodeURIComponent(process.argv[1]))' "ghcr.io/${{ steps.ver.outputs.owner }}/brewlite-api:${{ steps.ver.outputs.target }}")
+          curl -fsS -X POST "${API_HOOK}&imgURL=${IMG}" > /dev/null
+          echo "Đã gửi yêu cầu deploy API"
+      - name: Chờ API mới khoẻ
+        run: node scripts/smoke-test.mjs "$API_URL" "$WEB_URL" "${{ steps.ver.outputs.target }}" --api-only
+      - name: Deploy web
+        run: |
+          IMG=$(node -e 'console.log(encodeURIComponent(process.argv[1]))' "ghcr.io/${{ steps.ver.outputs.owner }}/brewlite-web:${{ steps.ver.outputs.target }}")
+          curl -fsS -X POST "${WEB_HOOK}&imgURL=${IMG}" > /dev/null
+          echo "Đã gửi yêu cầu deploy web"
+      - name: Smoke test toàn hệ thống
+        run: node scripts/smoke-test.mjs "$API_URL" "$WEB_URL" "${{ steps.ver.outputs.target }}"
+      - name: Ghi kết quả
+        run: echo "Production đang chạy ${{ steps.ver.outputs.target }}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Rollback về phiên bản trước khi thất bại
+        if: failure() && steps.ver.outputs.previous != '' && steps.ver.outputs.previous != 'dev' && steps.ver.outputs.previous != steps.ver.outputs.target
+        run: |
+          PREV="${{ steps.ver.outputs.previous }}"
+          echo "::warning::Triển khai thất bại, rollback về $PREV"
+          for app in api web; do
+            HOOK=$([ "$app" = api ] && echo "$API_HOOK" || echo "$WEB_HOOK")
+            IMG=$(node -e 'console.log(encodeURIComponent(process.argv[1]))' "ghcr.io/${{ steps.ver.outputs.owner }}/brewlite-$app:$PREV")
+            curl -fsS -X POST "${HOOK}&imgURL=${IMG}" > /dev/null
+          done
+          node scripts/smoke-test.mjs "$API_URL" "$WEB_URL" "$PREV"
+          echo "Đã rollback về $PREV" >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+  release:
+    name: GitHub Release
+    needs: deploy
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tạo release từ docs/releases/<tag>.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NOTES="docs/releases/${GITHUB_REF_NAME}.md"
+          [ -f "$NOTES" ] || NOTES=/dev/null
+          gh release create "$GITHUB_REF_NAME" --title "BrewLite $GITHUB_REF_NAME" --notes-file "$NOTES" --verify-tag

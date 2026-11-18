@@ -1,5 +1,5 @@
-# Chạy toàn bộ BrewLite: docker compose up --build
-# Frontend: http://localhost:3000 · API: http://localhost:3001 · PostgreSQL: localhost:5432
+# Chạy toàn bộ BrewLite ở máy local: docker compose up --build
+# Web: http://localhost:3000 · API: http://localhost:3001 (health: /health) · PostgreSQL: localhost:5432
 services:
   db:
     image: postgres:16-alpine
@@ -15,27 +15,29 @@ services:
       timeout: 3s
       retries: 20
 
-  backend:
-    build: ./backend
+  api:
+    build: ./apps/api
     environment:
       PORT: 3001
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-brewlite}
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
-      CORS_ORIGIN: http://localhost:3000
-      DB_SYNC: "true"
+      JWT_SECRET: ${JWT_SECRET:-local-dev-secret-change-me-0123456789abcdef}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
       SEED: "true"
+      LOG_FORMAT: text
     ports: ["3001:3001"]
     depends_on:
       db:
         condition: service_healthy
 
-  frontend:
+  web:
     build:
-      context: ./frontend
+      context: ./apps/web
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
     ports: ["3000:3000"]
-    depends_on: [backend]
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   brewlite-db:

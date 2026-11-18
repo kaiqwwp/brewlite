@@ -1,0 +1,50 @@
+# Render Blueprint – hạ tầng production của BrewLite (Infrastructure as Code).
+# Tạo một lần: Render Dashboard → New → Blueprint → chọn repo này. Sau đó pipeline CD
+# (.github/workflows/cd.yml) triển khai từng phiên bản bằng deploy hook + image trên GHCR.
+# Thay <github-user> bằng tên tài khoản GitHub (chữ thường) trước khi tạo Blueprint.
+databases:
+  - name: brewlite-db
+    databaseName: brewlite
+    user: brewlite
+    plan: free
+    region: singapore
+    postgresMajorVersion: "16"
+    ipAllowList: []          # chặn mọi kết nối từ Internet; chỉ dịch vụ Render cùng region dùng Internal URL
+
+services:
+  - type: web
+    name: brewlite-api
+    runtime: image
+    image:
+      url: ghcr.io/<github-user>/brewlite-api:latest
+    plan: free
+    region: singapore
+    healthCheckPath: /health
+    autoDeploy: false        # chỉ pipeline CD được triển khai
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: brewlite-db
+          property: connectionString   # Internal URL, không đi qua Internet
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false          # nhập tay: https://brewlite-web.onrender.com
+      - key: STAFF_PASSWORD
+        sync: false
+      - key: SEED
+        value: "true"
+      - key: LOG_FORMAT
+        value: json
+
+  - type: web
+    name: brewlite-web
+    runtime: image
+    image:
+      url: ghcr.io/<github-user>/brewlite-web:latest
+    plan: free
+    region: singapore
+    healthCheckPath: /health
+    autoDeploy: false

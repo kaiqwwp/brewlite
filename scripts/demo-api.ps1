@@ -52,5 +52,5 @@ Write-Host "  -> $($r.status)"
 $r = Invoke-RestMethod -Method Patch "$base/orders/$($o1.id)/status" -Headers $sh -ContentType $json -Body '{"status":"READY"}'
 Write-Host "  -> $($r.status)"
 Write-Host ""
-Write-Host "Xong. Ton kho dong thoi: chay trong thu muc backend:" -ForegroundColor Green
+Write-Host "Xong. Ton kho dong thoi: chay trong thu muc apps/api:" -ForegroundColor Green
 Write-Host '  npx jest --runInBand --testPathPattern=e2e -t "Task 10.3"' -ForegroundColor Green

@@ -2,7 +2,7 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { DataSource } from 'typeorm';
-import { Coupon } from '../entities/coupon.entity';
+import { Promotion } from '../entities/promotion.entity';
 import { Product } from '../entities/product.entity';
 import { User } from '../entities/user.entity';
 
@@ -30,10 +30,10 @@ export class SeedService implements OnApplicationBootstrap {
       await m.save(Product, PRODUCTS.map((p) => m.create(Product, { ...p, stock: 100 })));
       this.log.log(`Đã nạp ${PRODUCTS.length} sản phẩm mẫu`);
     }
-    if ((await m.count(Coupon)) === 0) {
-      await m.save(Coupon, [
-        m.create(Coupon, { code: 'BREW10', percentOff: 10, minTotal: 0, maxDiscount: 20000, active: true }),
-        m.create(Coupon, { code: 'WELCOME20', percentOff: 20, minTotal: 100000, maxDiscount: 50000, active: true }),
+    if ((await m.count(Promotion)) === 0) {
+      await m.save(Promotion, [
+        m.create(Promotion, { code: 'BREW10', percentOff: 10, minTotal: 0, maxDiscount: 20000, active: true }),
+        m.create(Promotion, { code: 'WELCOME20', percentOff: 20, minTotal: 100000, maxDiscount: 50000, active: true }),
       ]);
     }
     const staffEmail = process.env.STAFF_EMAIL ?? 'staff@brewlite.local';

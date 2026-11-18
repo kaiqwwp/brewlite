@@ -1,13 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
-import { Coupon } from '../entities/coupon.entity';
+import { LoyaltyTransaction, LoyaltyType } from '../entities/loyalty-transaction.entity';
+import { Promotion } from '../entities/promotion.entity';
 import { Order } from '../entities/order.entity';
 import { User } from '../entities/user.entity';
 
 export const POINT_UNIT = 10000; // mỗi 10.000đ thanh toán = 1 điểm
 
 /** Hàm thuần: tính số tiền giảm. Ném lỗi nếu mã không hợp lệ. */
-export function computeDiscount(coupon: Coupon | null, subtotal: number, now = new Date()): number {
+export function computeDiscount(coupon: Promotion | null, subtotal: number, now = new Date()): number {
   if (!coupon || !coupon.active) throw new BadRequestException('Mã giảm giá không hợp lệ');
   if (coupon.expiresAt && coupon.expiresAt.getTime() < now.getTime()) {
     throw new BadRequestException('Mã giảm giá đã hết hạn');
@@ -28,7 +29,7 @@ export function pointsFor(total: number): number {
 export class PromotionsService {
   async discountFor(m: EntityManager, code: string | undefined, subtotal: number): Promise<number> {
     if (!code) return 0;
-    const coupon = await m.findOne(Coupon, { where: { code: code.trim().toUpperCase() } });
+    const coupon = await m.findOne(Promotion, { where: { code: code.trim().toUpperCase() } });
     return computeDiscount(coupon, subtotal);
   }
 
@@ -37,6 +38,7 @@ export class PromotionsService {
     const points = pointsFor(order.total);
     const flag = await m.update(Order, { id: order.id, pointsAwarded: false }, { pointsAwarded: true });
     if (flag.affected !== 1 || points <= 0) return 0;
+    await m.insert(LoyaltyTransaction, { userId: order.userId, orderId: order.id, type: LoyaltyType.EARN, points });
     await m.increment(User, { id: order.userId }, 'loyaltyPoints', points);
     return points;
   }
@@ -46,7 +48,16 @@ export class PromotionsService {
     const points = pointsFor(order.total);
     const flag = await m.update(Order, { id: order.id, pointsAwarded: true }, { pointsAwarded: false });
     if (flag.affected !== 1 || points <= 0) return 0;
+    await m.insert(LoyaltyTransaction, { userId: order.userId, orderId: order.id, type: LoyaltyType.REVOKE, points });
     await m.query('UPDATE users SET "loyaltyPoints" = GREATEST("loyaltyPoints" - $1, 0) WHERE id = $2', [points, order.userId]);
     return points;
+  }
+}
+
+@Injectable()
+export class LoyaltyService {
+  /** Lịch sử điểm của một người dùng, mới nhất trước. */
+  history(m: EntityManager, userId: number) {
+    return m.find(LoyaltyTransaction, { where: { userId }, order: { id: 'DESC' }, take: 50 });
   }
 }

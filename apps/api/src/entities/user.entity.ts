@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Check, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
+@Check('CHK_users_points_non_negative', '"loyaltyPoints" >= 0')
 export class User {
   @PrimaryGeneratedColumn() id: number;
   @Column({ type: 'varchar', unique: true }) email: string;

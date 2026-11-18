@@ -1,134 +1,132 @@
-# BrewLite – Ứng dụng đặt cà phê không dùng tiền mặt
+# BrewLite – Đặt cà phê không tiền mặt
 
-Bài tập lớn môn **Công nghệ Phần mềm** (Trường ĐH Sài Gòn, HK I 2026–2027), thực hiện theo quy trình **Agile Scrum**.
+Ứng dụng web mobile-first (PWA) cho khách xem menu, chọn size/topping, đặt và thanh toán đồ uống bằng ví điện tử hoặc thẻ (mô phỏng), rồi nhận tại quầy.
 
-> *"BrewLite giúp khách hàng đặt và thanh toán đồ uống không dùng tiền mặt chỉ trong vài chạm, giảm thời gian xếp hàng và nhận đơn nhanh tại quầy."*
+Bài tập lớn môn **Công nghệ Phần mềm**, ĐH Sài Gòn, HK I 2026–2027 · Thực hiện: Lâm Sơn Hùng (3123560031) · Giảng viên: Từ Lãng Phiêu · Quy trình: Agile Scrum.
+
+| | |
+|---|---|
+| Web production | *https://brewlite-web.onrender.com* (điền URL thật sau khi triển khai) |
+| API production | *https://brewlite-api.onrender.com* · health check: `/health` |
+| Phiên bản | 2.0.0 (Assignment 2) – [release notes](docs/releases/v2.0.0.md) · [CHANGELOG](CHANGELOG.md) |
+
+## Công nghệ
 
 | Thành phần | Công nghệ |
 |---|---|
-| Frontend (`frontend/`) | Next.js 14 (React, TypeScript), TailwindCSS, Zustand (giỏ hàng, đăng nhập) |
-| Backend (`backend/`) | NestJS 10 (TypeScript), REST, class-validator, JWT (Passport), bcrypt |
-| CSDL | PostgreSQL 16 + TypeORM |
-| Thanh toán | Mock Payment Gateway (mô phỏng Momo/VNPay/Stripe) |
-| DevOps | Docker Compose, Git |
+| `apps/web` | Next.js 14 (App Router, TypeScript), Tailwind CSS, Zustand, PWA (manifest + service worker) |
+| `apps/api` | NestJS 10, TypeORM 0.3 (migration), Passport JWT, bcrypt, class-validator |
+| CSDL | PostgreSQL 16 |
+| Kiểm thử | Jest + Supertest (API), Vitest + Testing Library (web), Playwright (E2E) |
+| DevOps | Docker, Docker Compose, GitHub Actions, GitHub Container Registry, Render |
 
-## 1. Chạy nhanh bằng Docker Compose
+## Tài liệu
 
-Yêu cầu: Docker + Docker Compose v2.
+| Task | Tạo phẩm |
+|---|---|
+| 1 – Yêu cầu | [Bối cảnh và phạm vi](docs/requirements/context-and-scope.md) · [SRS](docs/requirements/srs.md) · [Đặc tả UC-05](docs/requirements/use-case-checkout.md) |
+| 2 – Mô hình hóa | [Activity, sequence, class (PlantUML + SVG)](docs/diagrams/README.md) |
+| 3 – Kiến trúc | [Kiến trúc C4 + phân lớp](docs/architecture/architecture.md) · [ADR](docs/architecture/adr/) · [Deployment diagram](docs/diagrams/deployment-production.svg) |
+| 4, 5 – Sprint | [Product Backlog](docs/process/product-backlog.md) · [Sprint 1](docs/process/sprint-1.md) · [Sprint 2](docs/process/sprint-2.md) · [Definition of Done](docs/process/definition-of-done.md) · [Quy ước](CONTRIBUTING.md) |
+| Truy vết | [traceability-matrix.md](docs/traceability-matrix.md) |
+| Triển khai | [deployment.md](docs/deployment.md) – CI/CD, thiết lập Render, phát hành, rollback |
+| Assignment 1 | [Báo cáo kiểm thử giao diện](docs/BrewLite_Bao_cao_kiem_thu.pdf) · `report/` (LaTeX) |
+
+## 1. Chạy ở máy local bằng Docker (khuyến nghị)
+
+Yêu cầu: Docker Desktop (hoặc Docker Engine + Compose v2).
 
 ```bash
+git clone https://github.com/<user>/brewlite.git && cd brewlite
 docker compose up --build
 ```
 
-- Frontend: <http://localhost:3000>
-- API: <http://localhost:3001> (ví dụ `GET /products`)
-- Lần chạy đầu, backend tự tạo bảng và nạp dữ liệu mẫu (8 đồ uống, 2 mã giảm giá, 1 tài khoản nhân viên).
+- Web: http://localhost:3000 · API: http://localhost:3001 · Health: http://localhost:3001/health
+- Lần chạy đầu, API tự chạy migration và nạp dữ liệu mẫu (8 đồ uống, 2 mã giảm giá, 1 tài khoản nhân viên).
+- Dừng: `docker compose down` (thêm `-v` để xoá dữ liệu). Nâng cấp từ bản 1.0.0 nên chạy `docker compose down -v` một lần vì schema nay do migration quản lý.
+- Mở web từ máy khác trong mạng: `NEXT_PUBLIC_API_URL=http://<ip>:3001 CORS_ORIGIN=http://<ip>:3000 docker compose up --build` (URL API được nhúng vào web lúc build).
 
-Dừng: `docker compose down` (thêm `-v` để xóa dữ liệu).
+## 2. Chạy không dùng Docker
 
-Nếu mở web từ máy khác, đặt `NEXT_PUBLIC_API_URL=http://<ip-máy-chủ>:3001` rồi `docker compose up --build` lại (biến này được nhúng vào frontend lúc build).
-
-## 2. Chạy thủ công (phát triển)
-
-Yêu cầu: Node.js ≥ 20, PostgreSQL ≥ 14.
+Yêu cầu: Node.js 22, PostgreSQL 16 có CSDL `brewlite` (user/mật khẩu `postgres`/`postgres`, hoặc đặt `DATABASE_URL`).
 
 ```bash
-# 1) CSDL
-createdb brewlite            # hoặc dùng: docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=brewlite postgres:16-alpine
-
-# 2) Backend  (http://localhost:3001)
-cd backend
-cp .env.example .env         # chỉnh DATABASE_URL nếu cần
-npm install
-npm run start:dev
-
-# 3) Frontend (http://localhost:3000)
-cd ../frontend
-cp .env.example .env.local
-npm install
-npm run dev
+npm run install:all                    # cài gốc (Playwright), apps/api, apps/web
+cd apps/api && npm run start:dev       # http://localhost:3001, tự chạy migration + seed
+cd apps/web && npm run dev             # http://localhost:3000
 ```
+
+Biến môi trường: xem [.env.example](.env.example).
 
 ## 3. Kiểm thử
 
-Cần một CSDL PostgreSQL trống tên `brewlite_test` (test sẽ **xóa và tạo lại schema** của DB này).
-
 ```bash
-createdb brewlite_test
-cd backend
-# mặc định: postgres://postgres:postgres@localhost:5432/brewlite_test ; đổi bằng biến TEST_DATABASE_URL
-npm run test        # unit test (state machine, tính giá, khuyến mãi)
-npm run test:e2e    # integration test qua HTTP + PostgreSQL thật
-npm run test:all    # cả hai: 33 test
+createdb brewlite_test                 # một lần; đổi bằng TEST_DATABASE_URL
+npm run lint                           # ESLint + kiểm tra kiểu cho api và web
+npm test                               # unit: 15 test API + 7 test component web
+npm run test:integration               # 27 integration test API trên PostgreSQL thật (schema tạo bằng migration)
+npm run build                          # build api và web
+docker compose up --build -d && npm run test:e2e   # E2E Playwright: menu → xác nhận đơn (khung Pixel 7)
+npx playwright install chromium        # nếu máy chưa có trình duyệt cho Playwright
 ```
 
-Các test chứng minh yêu cầu chấm điểm của **Task 10** (`backend/test/`):
+Mã test (`UT-xx`, `INT-Txx`, `FE-Txx`, `E2E-T01`) được nối với yêu cầu trong [ma trận truy vết](docs/traceability-matrix.md).
 
-| Tiêu chí | Test |
+## 4. Build, deploy, rollback
+
+| Việc | Lệnh / cách làm |
 |---|---|
-| (a) Chặn chuyển trạng thái sai | `unit/order-status.spec.ts` (đủ 49 cặp trạng thái) và `e2e/api.e2e.spec.ts` › *Order State Machine* |
-| (b) Gửi 2 lần cùng `Idempotency-Key` chỉ tạo 1 đơn | `e2e` › *thanh toán / tạo đơn idempotent* (tuần tự và 5 request đồng thời) |
-| (c) Đặt đồng thời không vượt tồn kho | `e2e` › *tồn kho khi đặt đồng thời* (12 khách tranh 5 sản phẩm → đúng 5 đơn) |
+| Build image local | `docker build -t brewlite-api apps/api` · `docker build --build-arg NEXT_PUBLIC_API_URL=http://localhost:3001 -t brewlite-web apps/web` |
+| CI | Tự chạy khi mở PR vào `main`: install → lint → unit test → build → integration → e2e → gitleaks |
+| Deploy production | Merge PR vào `main` (hoặc đẩy tag `vX.Y.Z`): CD build image tag commit SHA → GHCR → Render → smoke test |
+| Smoke test tay | `npm run smoke -- https://<api> https://<web>` |
+| Rollback | GitHub → Actions → **CD** → *Run workflow* → `rollback_to` = SHA bản tốt. Pipeline cũng tự rollback khi deploy/smoke test lỗi |
+| Thiết lập lần đầu | [docs/deployment.md](docs/deployment.md) mục 2 |
 
-## 4. Tài khoản & dữ liệu mẫu
+## 5. Tài khoản và dữ liệu mẫu
 
 | Vai trò | Email | Mật khẩu |
 |---|---|---|
 | Khách hàng | tự đăng ký tại `/register` | tối thiểu 6 ký tự |
-| Nhân viên quầy (phần mở rộng) | `staff@brewlite.local` | `staff123` |
+| Nhân viên quầy | `staff@brewlite.local` | local: `staff123`; production: giá trị `STAFF_PASSWORD` trên Render |
 
-Mã giảm giá: `BREW10` (giảm 10%, tối đa 20.000đ), `WELCOME20` (giảm 20% cho đơn từ 100.000đ, tối đa 50.000đ).
-Điểm thưởng: 1 điểm cho mỗi 10.000đ của đơn đã thanh toán.
-Ở màn hình thanh toán có ô *"Mô phỏng thanh toán lỗi"* để demo luồng `PAYMENT_FAILED` → thử lại.
+Mã giảm giá: `BREW10` (10%, tối đa 20.000đ), `WELCOME20` (20% cho đơn từ 100.000đ, tối đa 50.000đ). Điểm thưởng: 1 điểm mỗi 10.000đ đơn đã thanh toán. Màn hình thanh toán có ô *Mô phỏng thanh toán lỗi* để demo `PAYMENT_FAILED` → thử lại.
 
-## 5. API
+## 6. API
 
 | Endpoint | Chức năng | Auth |
 |---|---|---|
-| `GET /products` | Danh sách menu (id, tên, giá, ảnh) | – |
-| `GET /products/:id` | Chi tiết + tuỳ chọn size/topping | – |
-| `POST /auth/register` | Đăng ký (mật khẩu băm bcrypt), trả JWT | – |
-| `POST /auth/login` | Đăng nhập, trả JWT | – |
-| `GET /auth/me` | Thông tin tài khoản + điểm thưởng | JWT |
-| `POST /orders` | Tạo đơn `PENDING`, giữ kho, áp mã giảm giá. Hỗ trợ header `Idempotency-Key` | JWT |
-| `POST /payments` | Thanh toán (Ví/Thẻ), **bắt buộc** header `Idempotency-Key`. `201` thành công, `200` phát lại, `402` thất bại | JWT |
-| `GET /orders/me` | Lịch sử đơn của tôi | JWT |
-| `GET /orders/:id` | Chi tiết một đơn (chủ đơn hoặc nhân viên) | JWT |
-| `POST /orders/:id/cancel` | Hủy đơn (PENDING/PAYMENT_FAILED/PAID), hoàn kho | JWT |
+| `GET /health` | Trạng thái API, CSDL, số migration, phiên bản (commit SHA) | – |
+| `GET /products`, `GET /products/:id` | Menu; chi tiết + tuỳ chọn size/topping | – |
+| `POST /auth/register`, `POST /auth/login` | Đăng ký, đăng nhập, trả JWT | – |
+| `GET /auth/me` | Tài khoản + điểm thưởng | JWT |
+| `POST /orders` | Tạo đơn `PENDING`, giữ kho, áp mã. Header `Idempotency-Key` tuỳ chọn | JWT |
+| `POST /payments` | Thanh toán Ví/Thẻ, bắt buộc `Idempotency-Key`. `201` thành công, `200` phát lại, `402` thất bại | JWT |
+| `GET /orders/me`, `GET /orders/:id` | Lịch sử đơn; chi tiết đơn | JWT |
+| `POST /orders/:id/cancel` | Hủy đơn, hoàn kho, thu hồi điểm | JWT |
 | `PATCH /orders/:id/status` | Nhân viên chuyển `PREPARING → READY → COMPLETED` | JWT + STAFF |
+| `GET /loyalty/me` | Số dư và lịch sử cộng/thu hồi điểm | JWT |
 
-Ví dụ:
-
-```bash
-TOKEN=$(curl -s localhost:3001/auth/login -H 'Content-Type: application/json' \
-  -d '{"email":"staff@brewlite.local","password":"staff123"}' | jq -r .accessToken)
-curl -s localhost:3001/orders -H "Authorization: Bearer $TOKEN" -H 'Idempotency-Key: demo-1' \
-  -H 'Content-Type: application/json' \
-  -d '{"items":[{"productId":3,"size":"L","toppings":["PEARL"],"qty":2}],"couponCode":"BREW10"}'
-```
-
-## 6. Nghiệp vụ backend (Task 10)
-
-1. **Order State Machine** – `backend/src/orders/order-status.ts`. `PENDING → PAID → PREPARING → READY → COMPLETED`; ngoại lệ `PAYMENT_FAILED` (thử lại về `PENDING`) và `CANCELLED`. Mọi chuyển tiếp đi qua `assertTransition`, rồi `UPDATE ... WHERE status = <trạng thái hiện tại>` để hai request đồng thời không thể cùng chuyển một đơn.
-2. **Thanh toán idempotent** – `payments.service.ts`. `Idempotency-Key` có ràng buộc `UNIQUE`; khóa dòng đơn (`SELECT ... FOR UPDATE`) để các request đồng thời trên một đơn xử lý tuần tự; gửi lại cùng key trả đúng kết quả cũ (`Idempotent-Replayed: true`).
-3. **Tồn kho đồng thời** – `stock.service.ts`. Transaction + optimistic locking bằng cột `version`: chỉ trừ kho khi `version` chưa đổi và `stock` đủ, nếu không thì đọc lại và thử lại; thiếu hàng trả `409 OUT_OF_STOCK` và rollback toàn bộ đơn.
-4. **Khuyến mãi & loyalty** – `promotions.service.ts`. Kiểm tra mã (còn hiệu lực, hết hạn, đơn tối thiểu, trần giảm); cộng điểm đúng một lần khi đơn chuyển `PAID`.
-
-## 7. Cấu trúc thư mục
+## 7. Cấu trúc repository
 
 ```
 brewlite/
-├── backend/            # NestJS API (src/, test/, Dockerfile)
-├── frontend/           # Next.js UI (app/, components/, lib/, Dockerfile)
-├── docs/               # ảnh chụp màn hình, kết quả test
-├── report/             # báo cáo LaTeX (Assignment_report.tex → PDF)
-├── docker-compose.yml  # db + backend + frontend
+├── apps/
+│   ├── web/                  # Next.js mobile-first/PWA (app/, components/, lib/, __tests__/, Dockerfile)
+│   └── api/                  # NestJS (src/, src/database/migrations/, test/unit, test/e2e, Dockerfile)
+├── docs/
+│   ├── requirements/         # Task 1
+│   ├── diagrams/             # Task 2 (+ C4, deployment) – .puml và .svg
+│   ├── architecture/         # Task 3 – architecture.md, adr/
+│   ├── process/              # backlog, sprint review/retro, DoD
+│   ├── releases/             # release notes
+│   ├── traceability-matrix.md
+│   └── deployment.md
+├── tests/e2e/                # Playwright
+├── scripts/                  # smoke-test.mjs, create-github-backlog.sh, demo-api.ps1
+├── .github/workflows/        # ci.yml, cd.yml
+├── render.yaml               # hạ tầng Render (Blueprint)
+├── docker-compose.yml
+├── .env.example
 └── README.md
 ```
-
-## 8. Ghi chú kỹ thuật
-
-- Giá luôn được **server tính lại** từ giá gốc + size + topping; client không thể gửi giá.
-- `DB_SYNC=true` (mặc định) để tự tạo bảng cho tiện demo; môi trường thật nên dùng migration và đặt `JWT_SECRET` riêng.
-- Kho được **giữ ngay khi tạo đơn** và hoàn lại khi hủy đơn.
-- Chức năng nhân viên quầy (cập nhật trạng thái pha chế) chỉ có ở API, ngoài phạm vi MVP.

@@ -1,4 +1,7 @@
 node_modules
+dist
 .next
-.env
+coverage
 *.log
+.env
+__tests__

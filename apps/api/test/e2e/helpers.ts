@@ -6,7 +6,7 @@ import request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/app.setup';
 import { Product } from '../../src/entities/product.entity';
-import { Coupon } from '../../src/entities/coupon.entity';
+import { Promotion } from '../../src/entities/promotion.entity';
 import { User } from '../../src/entities/user.entity';
 
 export interface TestCtx { app: INestApplication; ds: DataSource; http: () => ReturnType<typeof request> }
@@ -42,8 +42,8 @@ export async function createProduct(ctx: TestCtx, stock = 10, price = 45000, nam
   return ctx.ds.manager.save(Product, ctx.ds.manager.create(Product, { name, price, stock, imageUrl: '', description: '' }));
 }
 
-export async function createCoupon(ctx: TestCtx, c: Partial<Coupon>) {
-  return ctx.ds.manager.save(Coupon, ctx.ds.manager.create(Coupon, { active: true, minTotal: 0, maxDiscount: null, expiresAt: null, ...c } as Coupon));
+export async function createCoupon(ctx: TestCtx, c: Partial<Promotion>) {
+  return ctx.ds.manager.save(Promotion, ctx.ds.manager.create(Promotion, { active: true, minTotal: 0, maxDiscount: null, expiresAt: null, ...c } as Promotion));
 }
 
 export const auth = (token: string) => ({ Authorization: `Bearer ${token}` });

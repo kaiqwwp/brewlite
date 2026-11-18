@@ -8,7 +8,7 @@ describe('BrewLite API (e2e)', () => {
   afterAll(async () => { await ctx.app.close(); });
 
   describe('Task 2 – sản phẩm', () => {
-    it('GET /products trả menu (id, tên, giá, ảnh) và GET /products/:id kèm tuỳ chọn', async () => {
+    it('INT-T01 GET /products trả menu (id, tên, giá, ảnh) và GET /products/:id kèm tuỳ chọn', async () => {
       const p = await createProduct(ctx, 5, 39000, 'Trà đào');
       const list = await ctx.http().get('/products').expect(200);
       expect(list.body.find((x: any) => x.id === p.id)).toMatchObject({ id: p.id, name: 'Trà đào', price: 39000 });
@@ -21,7 +21,7 @@ describe('BrewLite API (e2e)', () => {
   });
 
   describe('Task 7 – đăng ký / đăng nhập (JWT)', () => {
-    it('đăng ký, băm mật khẩu, đăng nhập, /auth/me', async () => {
+    it('INT-T02 đăng ký, băm mật khẩu, đăng nhập, /auth/me', async () => {
       const email = 'a@test.local';
       const reg = await ctx.http().post('/auth/register').send({ email, password: 'secret123' }).expect(201);
       expect(reg.body.accessToken).toBeTruthy();
@@ -33,19 +33,19 @@ describe('BrewLite API (e2e)', () => {
       expect(me.body).toMatchObject({ email, loyaltyPoints: 0, role: 'CUSTOMER' });
       expect(me.body).not.toHaveProperty('passwordHash');
     });
-    it('email trùng → 409, sai mật khẩu → 401, dữ liệu sai → 400', async () => {
+    it('INT-T03 email trùng → 409, sai mật khẩu → 401, dữ liệu sai → 400', async () => {
       await ctx.http().post('/auth/register').send({ email: 'a@test.local', password: 'secret123' }).expect(409);
       await ctx.http().post('/auth/login').send({ email: 'a@test.local', password: 'wrong-pass' }).expect(401);
       await ctx.http().post('/auth/register').send({ email: 'not-an-email', password: '123' }).expect(400);
     });
-    it('guard: đặt đơn không có token → 401, token sai → 401', async () => {
+    it('INT-T04 guard: đặt đơn không có token → 401, token sai → 401', async () => {
       await ctx.http().post('/orders').send({ items: [] }).expect(401);
       await ctx.http().get('/orders/me').set(auth('bad.token.value')).expect(401);
     });
   });
 
   describe('Task 6 – POST /orders', () => {
-    it('server tự tính giá, lưu PENDING, trừ kho, trả mã đơn', async () => {
+    it('INT-T05 server tự tính giá, lưu PENDING, trừ kho, trả mã đơn', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10, 45000);
       const res = await ctx.http().post('/orders').set(auth(u.token))
@@ -56,7 +56,7 @@ describe('BrewLite API (e2e)', () => {
       expect(res.body.total).toBe(154000);
       expect((await ctx.ds.manager.findOneByOrFail(Product, { id: p.id })).stock).toBe(7);
     });
-    it('validate đầu vào: giỏ rỗng, size sai, số lượng sai, thuộc tính lạ, sản phẩm không tồn tại', async () => {
+    it('INT-T06 validate đầu vào: giỏ rỗng, size sai, số lượng sai, thuộc tính lạ, sản phẩm không tồn tại', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10);
       const post = (b: any) => ctx.http().post('/orders').set(auth(u.token)).send(b);
@@ -67,7 +67,7 @@ describe('BrewLite API (e2e)', () => {
       await post({ items: [{ ...item(p.id), unitPrice: 1 }] }).expect(400); // không tin giá từ client
       await post({ items: [item(999999)] }).expect(400);
     });
-    it('GET /orders/me chỉ trả đơn của chính mình', async () => {
+    it('INT-T07 GET /orders/me chỉ trả đơn của chính mình', async () => {
       const a = await registerUser(ctx, 'a'); const b = await registerUser(ctx, 'b');
       const p = await createProduct(ctx, 10);
       const o = await ctx.http().post('/orders').set(auth(a.token)).send({ items: [item(p.id)] }).expect(201);
@@ -80,7 +80,7 @@ describe('BrewLite API (e2e)', () => {
   });
 
   describe('Task 8 – thanh toán', () => {
-    it('thành công → PAID; thiếu Idempotency-Key → 400', async () => {
+    it('INT-T08 thành công → PAID; thiếu Idempotency-Key → 400', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10, 45000);
       const o = await ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(p.id)] }).expect(201);
@@ -89,7 +89,7 @@ describe('BrewLite API (e2e)', () => {
         .send({ orderId: o.body.id, method: 'WALLET' }).expect(201);
       expect(pay.body).toMatchObject({ success: true, payment: { status: 'SUCCESS', amount: 45000 }, order: { status: 'PAID' } });
     });
-    it('lỗi → PAYMENT_FAILED (402), giữ nguyên đơn, thử lại bằng key mới → PAID', async () => {
+    it('INT-T09 lỗi → PAYMENT_FAILED (402), giữ nguyên đơn, thử lại bằng key mới → PAID', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10);
       const o = await ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(p.id)] }).expect(201);
@@ -100,7 +100,7 @@ describe('BrewLite API (e2e)', () => {
         .send({ orderId: o.body.id, method: 'CARD' }).expect(201);
       expect(retry.body.order.status).toBe('PAID');
     });
-    it('không thanh toán lại đơn đã PAID (key khác) → 409; đơn người khác → 400', async () => {
+    it('INT-T10 không thanh toán lại đơn đã PAID (key khác) → 409; đơn người khác → 400', async () => {
       const u = await registerUser(ctx); const other = await registerUser(ctx);
       const p = await createProduct(ctx, 10);
       const o = await ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(p.id)] }).expect(201);
@@ -118,7 +118,7 @@ describe('BrewLite API (e2e)', () => {
       const pending = o.body.id as number;
       return { u, p, id: pending, pay: () => ctx.http().post('/payments').set(auth(u.token)).set('Idempotency-Key', `p-${pending}`).send({ orderId: pending, method: 'WALLET' }) };
     }
-    it('(a) chặn chuyển trạng thái sai: PENDING→READY, PAID→READY, COMPLETED→PREPARING đều 409', async () => {
+    it('INT-T11 (a) chặn chuyển trạng thái sai: PENDING→READY, PAID→READY, COMPLETED→PREPARING đều 409', async () => {
       const staff = await createStaff(ctx);
       const o = await paidOrder();
       const set = (s: string) => ctx.http().patch(`/orders/${o.id}/status`).set(auth(staff.token)).send({ status: s });
@@ -133,13 +133,13 @@ describe('BrewLite API (e2e)', () => {
       await set('PREPARING').expect(409);    // trạng thái kết thúc
       await set('CANCELLED').expect(409);
     });
-    it('khách không có quyền cập nhật trạng thái pha chế (403); nhân viên không được đặt PAID tay (400)', async () => {
+    it('INT-T12 khách không có quyền cập nhật trạng thái pha chế (403); nhân viên không được đặt PAID tay (400)', async () => {
       const staff = await createStaff(ctx);
       const o = await paidOrder();
       await ctx.http().patch(`/orders/${o.id}/status`).set(auth(o.u.token)).send({ status: 'PREPARING' }).expect(403);
       await ctx.http().patch(`/orders/${o.id}/status`).set(auth(staff.token)).send({ status: 'PAID' }).expect(400);
     });
-    it('hủy đơn nhả kho; không hủy được đơn đã hủy', async () => {
+    it('INT-T13 hủy đơn nhả kho; không hủy được đơn đã hủy', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 5);
       const o = await ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(p.id, 3)] }).expect(201);
@@ -152,7 +152,7 @@ describe('BrewLite API (e2e)', () => {
   });
 
   describe('Task 10.2 – thanh toán / tạo đơn idempotent', () => {
-    it('(b) POST /orders gửi 2 lần cùng Idempotency-Key (tuần tự) chỉ tạo 1 đơn, trừ kho 1 lần', async () => {
+    it('INT-T14 (b) POST /orders gửi 2 lần cùng Idempotency-Key (tuần tự) chỉ tạo 1 đơn, trừ kho 1 lần', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10);
       const send = () => ctx.http().post('/orders').set(auth(u.token)).set('Idempotency-Key', 'order-key-1').send({ items: [item(p.id, 2)] });
@@ -163,7 +163,7 @@ describe('BrewLite API (e2e)', () => {
       expect((await ctx.http().get('/orders/me').set(auth(u.token))).body).toHaveLength(1);
       expect((await ctx.ds.manager.findOneByOrFail(Product, { id: p.id })).stock).toBe(8);
     });
-    it('(b) POST /orders 5 yêu cầu ĐỒNG THỜI cùng key chỉ tạo 1 đơn', async () => {
+    it('INT-T15 (b) POST /orders 5 yêu cầu ĐỒNG THỜI cùng key chỉ tạo 1 đơn', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10);
       const results = await Promise.all(Array.from({ length: 5 }, () =>
@@ -173,7 +173,7 @@ describe('BrewLite API (e2e)', () => {
       expect((await ctx.http().get('/orders/me').set(auth(u.token))).body).toHaveLength(1);
       expect((await ctx.ds.manager.findOneByOrFail(Product, { id: p.id })).stock).toBe(9);
     });
-    it('(b) POST /payments gửi lặp / đồng thời cùng key: 1 giao dịch, điểm thưởng cộng 1 lần', async () => {
+    it('INT-T16 (b) POST /payments gửi lặp / đồng thời cùng key: 1 giao dịch, điểm thưởng cộng 1 lần', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10, 45000);
       const o = await ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(p.id, 3)] }).expect(201); // 135000
@@ -189,7 +189,7 @@ describe('BrewLite API (e2e)', () => {
       const me = await ctx.http().get('/auth/me').set(auth(u.token));
       expect(me.body.loyaltyPoints).toBe(13); // floor(135000/10000)
     });
-    it('cùng Idempotency-Key nhưng dùng cho đơn khác → 409', async () => {
+    it('INT-T17 cùng Idempotency-Key nhưng dùng cho đơn khác → 409', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10);
       const o1 = await ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(p.id)] }).expect(201);
@@ -200,7 +200,7 @@ describe('BrewLite API (e2e)', () => {
   });
 
   describe('Task 10.3 – tồn kho khi đặt đồng thời', () => {
-    it('(c) 12 khách đặt cùng lúc 1 sản phẩm còn 5 → đúng 5 đơn thành công, kho về 0 (không âm)', async () => {
+    it('INT-T18 (c) 12 khách đặt cùng lúc 1 sản phẩm còn 5 → đúng 5 đơn thành công, kho về 0 (không âm)', async () => {
       const p = await createProduct(ctx, 5);
       const users = await Promise.all(Array.from({ length: 12 }, (_, i) => registerUser(ctx, `race${i}`)));
       const results = await Promise.all(users.map((u) =>
@@ -216,14 +216,14 @@ describe('BrewLite API (e2e)', () => {
       const sold = await ctx.ds.query('SELECT coalesce(sum(qty),0)::int AS n FROM order_items WHERE "productId" = $1', [p.id]);
       expect(sold[0].n).toBe(5);
     });
-    it('(c) đơn nhiều số lượng: kho 7, 6 khách mua 2 ly → tối đa 3 đơn, không vượt kho', async () => {
+    it('INT-T19 (c) đơn nhiều số lượng: kho 7, 6 khách mua 2 ly → tối đa 3 đơn, không vượt kho', async () => {
       const p = await createProduct(ctx, 7);
       const users = await Promise.all(Array.from({ length: 6 }, (_, i) => registerUser(ctx, `multi${i}`)));
       const results = await Promise.all(users.map((u) => ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(p.id, 2)] })));
       expect(results.filter((r) => r.status === 201)).toHaveLength(3);
       expect((await ctx.ds.manager.findOneByOrFail(Product, { id: p.id })).stock).toBe(1);
     });
-    it('đơn thất bại giữa chừng được rollback toàn bộ (không trừ kho sản phẩm khác)', async () => {
+    it('INT-T20 đơn thất bại giữa chừng được rollback toàn bộ (không trừ kho sản phẩm khác)', async () => {
       const u = await registerUser(ctx);
       const a = await createProduct(ctx, 10); const b = await createProduct(ctx, 1);
       await ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(a.id, 3), item(b.id, 2)] }).expect(409);
@@ -233,7 +233,7 @@ describe('BrewLite API (e2e)', () => {
   });
 
   describe('Task 10.4 – khuyến mãi & điểm thưởng', () => {
-    it('áp mã hợp lệ, cộng điểm sau khi PAID, không cộng khi thanh toán lỗi', async () => {
+    it('INT-T21 áp mã hợp lệ, cộng điểm sau khi PAID, không cộng khi thanh toán lỗi', async () => {
       await createCoupon(ctx, { code: 'TEST10', percentOff: 10 });
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10, 50000);
@@ -244,7 +244,7 @@ describe('BrewLite API (e2e)', () => {
       await ctx.http().post('/payments').set(auth(u.token)).set('Idempotency-Key', 'ls').send({ orderId: o.body.id, method: 'CARD' }).expect(201);
       expect((await ctx.http().get('/auth/me').set(auth(u.token))).body.loyaltyPoints).toBe(18);
     });
-    it('hủy đơn đã thanh toán thu hồi đúng số điểm đã cộng (một lần), không để điểm âm', async () => {
+    it('INT-T22 hủy đơn đã thanh toán thu hồi đúng số điểm đã cộng (một lần), không để điểm âm', async () => {
       const u = await registerUser(ctx);
       const p = await createProduct(ctx, 10, 50000);
       const o = await ctx.http().post('/orders').set(auth(u.token)).send({ items: [item(p.id, 2)] }).expect(201);
@@ -255,7 +255,7 @@ describe('BrewLite API (e2e)', () => {
       await ctx.http().post(`/orders/${o.body.id}/cancel`).set(auth(u.token)).expect(409); // hủy lần hai không trừ thêm
       expect((await ctx.http().get('/auth/me').set(auth(u.token))).body.loyaltyPoints).toBe(0);
     });
-    it('từ chối mã không tồn tại / hết hạn / chưa đủ đơn tối thiểu', async () => {
+    it('INT-T23 từ chối mã không tồn tại / hết hạn / chưa đủ đơn tối thiểu', async () => {
       await createCoupon(ctx, { code: 'OLD', percentOff: 10, expiresAt: new Date('2020-01-01') });
       await createCoupon(ctx, { code: 'BIG', percentOff: 10, minTotal: 500000 });
       const u = await registerUser(ctx);

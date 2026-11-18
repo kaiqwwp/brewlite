@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
 import { Order } from './order.entity';
+import { Product } from './product.entity';
 
 @Entity('order_items')
 export class OrderItem {
@@ -9,6 +10,9 @@ export class OrderItem {
   @JoinColumn({ name: 'orderId' })
   order: Order;
   @Column({ type: 'int' }) productId: number;
+  @ManyToOne(() => Product, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'productId' })
+  product?: Product;
   @Column({ type: 'varchar' }) productName: string;
   @Column({ type: 'varchar' }) size: string;
   @Column({ type: 'simple-array', nullable: true }) toppings: string[] | null;
