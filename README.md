@@ -30,6 +30,7 @@ Bài tập lớn môn **Công nghệ Phần mềm**, ĐH Sài Gòn, HK I 2026–
 | 4, 5 – Sprint | [Product Backlog](docs/process/product-backlog.md) · [Sprint 1](docs/process/sprint-1.md) · [Sprint 2](docs/process/sprint-2.md) · [Definition of Done](docs/process/definition-of-done.md) · [Quy ước](CONTRIBUTING.md) |
 | Truy vết | [traceability-matrix.md](docs/traceability-matrix.md) |
 | Triển khai | [deployment.md](docs/deployment.md) – CI/CD, thiết lập Render, phát hành, rollback |
+| Báo cáo Assignment 2 | [report-a2/Assignment2_report.pdf](report-a2/Assignment2_report.pdf) · nguồn LaTeX `report-a2/` (Overleaf, XeLaTeX) |
 | Assignment 1 | [Báo cáo kiểm thử giao diện](docs/BrewLite_Bao_cao_kiem_thu.pdf) · `report/` (LaTeX) |
 
 ## 1. Chạy ở máy local bằng Docker (khuyến nghị)
