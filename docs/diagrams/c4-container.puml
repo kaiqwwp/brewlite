@@ -1,0 +1,18 @@
+@startuml c4-container
+!include <C4/C4_Container>
+skinparam defaultFontName "DejaVu Sans"
+title C4 mức 2 – Container: BrewLite
+Person(customer, "Khách hàng", "Trình duyệt di động / PWA đã cài")
+Person(staff, "Nhân viên quầy", "Postman / công cụ HTTP (MVP)")
+System_Boundary(b, "BrewLite") {
+  Container(web, "Web app", "Next.js 14 App Router, React, Tailwind, Zustand", "Giao diện mobile-first, PWA (manifest + service worker). apps/web")
+  Container(api, "REST API", "NestJS 10, TypeORM, Passport JWT", "Module: auth, products, orders, payments, promotions/loyalty, health. apps/api")
+  ContainerDb(db, "CSDL", "PostgreSQL 16", "users, products, orders, order_items, payments, promotions, loyalty_transactions, migrations")
+  Container(gw, "Payment adapter", "MockPaymentGateway (NestJS provider)", "Mô phỏng cổng Ví/Thẻ, thay được bằng adapter thật")
+}
+Rel(customer, web, "Dùng", "HTTPS")
+Rel(web, api, "Gọi REST (fetch), Bearer JWT, Idempotency-Key", "HTTPS/JSON")
+Rel(staff, api, "PATCH /orders/:id/status", "HTTPS/JSON")
+Rel(api, db, "SQL, transaction, khoá dòng, optimistic lock; migration khi khởi động", "TCP 5432, mạng nội bộ")
+Rel(api, gw, "charge()")
+@enduml

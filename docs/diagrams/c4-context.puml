@@ -1,0 +1,16 @@
+@startuml c4-context
+!include <C4/C4_Context>
+skinparam defaultFontName "DejaVu Sans"
+title C4 mức 1 – System Context: BrewLite
+Person(customer, "Khách hàng", "Đặt và thanh toán đồ uống trên điện thoại")
+Person(staff, "Nhân viên quầy", "Pha chế, cập nhật trạng thái đơn")
+System(brewlite, "BrewLite", "Ứng dụng đặt cà phê không tiền mặt (PWA + REST API)")
+System_Ext(pay, "Cổng thanh toán", "Ví điện tử / Thẻ. MVP: MockPaymentGateway trong API")
+System_Ext(github, "GitHub", "Mã nguồn, Actions (CI/CD), GHCR (container registry)")
+System_Ext(render, "Render", "Nền tảng chạy container và PostgreSQL production")
+Rel(customer, brewlite, "Xem menu, đặt đơn, thanh toán, theo dõi đơn", "HTTPS")
+Rel(staff, brewlite, "Cập nhật PREPARING → READY → COMPLETED", "HTTPS, JWT role STAFF")
+Rel(brewlite, pay, "charge(amount, method)", "gọi trong tiến trình")
+Rel(github, render, "Deploy hook + image theo commit SHA", "HTTPS")
+Rel(render, brewlite, "Chạy và giám sát health check")
+@enduml

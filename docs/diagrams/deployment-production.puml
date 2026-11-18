@@ -1,0 +1,61 @@
+@startuml deployment-production
+!include _style.iuml
+title Deployment – BrewLite production trên Render (Singapore) với GitHub Actions + GHCR
+skinparam NodeBackgroundColor #FFFFFF
+skinparam NodeBorderColor #8A5A37
+skinparam ArtifactBackgroundColor #F7F1EA
+skinparam DatabaseBackgroundColor #EAF2FB
+skinparam rectangleBorderStyle dashed
+
+rectangle "LOCAL – máy lập trình viên" as LOCAL {
+  node "Laptop\n«device»" as dev {
+    artifact "docker-compose.yml\n(web :3000, api :3001, db :5432)" as compose
+    artifact "git push / pull request" as gitpush
+  }
+}
+
+rectangle "CI – GitHub (github.com)" as CI {
+  node "GitHub Actions runner\n«execution environment»\nubuntu-latest" as runner {
+    artifact "ci.yml: install → lint → unit test → build\n→ integration (Postgres service) → e2e → gitleaks" as ciwf
+    artifact "cd.yml: build image → push GHCR\n→ deploy hook → smoke test → rollback" as cdwf
+  }
+  node "GitHub Secrets / Variables\n«secret store»" as secrets {
+    artifact "RENDER_DEPLOY_HOOK_API\nRENDER_DEPLOY_HOOK_WEB\nvars: API_URL, WEB_URL" as sec
+  }
+  node "GitHub Container Registry\nghcr.io/<user>\n«container registry»" as ghcr {
+    artifact "brewlite-api:<commit SHA>\nbrewlite-api:<semver>, :latest" as imgapi
+    artifact "brewlite-web:<commit SHA>\nbrewlite-web:<semver>, :latest" as imgweb
+  }
+}
+
+rectangle "PRODUCTION – Render, region Singapore" as PROD {
+  node "Render Edge\n«load balancer / TLS»\nchứng chỉ HTTPS tự động" as edge
+  node "brewlite-web\n«Render Web Service, Docker»\nnode:22-alpine, PORT 3000" as webnode {
+    artifact "Next.js standalone server\n(SSR + static, PWA)\nhealth: GET /health" as webart
+  }
+  node "brewlite-api\n«Render Web Service, Docker»\nnode:22-alpine, PORT 3001" as apinode {
+    artifact "NestJS API\nmigration khi khởi động\nhealth: GET /health\nlog JSON → Render Logs" as apiart
+    artifact "ENV: NODE_ENV, DATABASE_URL,\nJWT_SECRET, CORS_ORIGIN, STAFF_PASSWORD\n(Render Environment, không có trong repo)" as env
+  }
+  database "brewlite-db\n«Render PostgreSQL 16»\npersistent disk\nipAllowList = [] (không public)" as db
+}
+
+node "Điện thoại / laptop của khách\n«device»" as phone {
+  artifact "Trình duyệt / PWA đã cài\n(service worker, manifest)" as pwa
+}
+
+gitpush --> runner : HTTPS (push, PR)
+runner --> ghcr : docker push (HTTPS, GITHUB_TOKEN)
+secrets ..> runner : secret được che trong log
+runner --> edge : POST deploy hook ?imgURL=…:SHA (HTTPS)
+edge ..> apinode : điều phối deploy
+apinode ..> ghcr : pull image
+webnode ..> ghcr : pull image
+runner --> edge : smoke test GET /health, /products, / (HTTPS)
+
+pwa --> edge : HTTPS 443\nbrewlite-web.onrender.com
+pwa --> edge : HTTPS 443 (fetch API)\nbrewlite-api.onrender.com
+edge --> webnode : HTTP :3000 (nội bộ)
+edge --> apinode : HTTP :3001 (nội bộ)
+apinode --> db : PostgreSQL TCP 5432\nInternal URL (mạng riêng Render)
+@enduml
