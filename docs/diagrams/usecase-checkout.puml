@@ -1,0 +1,39 @@
+@startuml usecase-checkout
+!include _style.iuml
+title UC-05 Đặt và thanh toán đơn hàng – phạm vi use-case trọng tâm
+left to right direction
+skinparam usecase {
+  BackgroundColor #F7F1EA
+  BorderColor #8A5A37
+}
+skinparam actorStyle awesome
+
+actor "Khách hàng" as Customer
+actor "Cổng thanh toán\n«system»\n(Ví điện tử / Thẻ)" as PG
+
+rectangle "BrewLite – UC-05" {
+  usecase "**UC-05 Đặt và thanh toán đơn hàng**" as UC05 #FFE7C2
+  usecase "UC-04 Đăng nhập / Đăng ký" as UC04
+  usecase "Tạo đơn: tính giá,\ngiữ tồn kho (FR-05)" as Create
+  usecase "Thanh toán idempotent\n(FR-07)" as Pay
+  usecase "Xem xác nhận đơn\n(FR-08)" as Confirm
+  usecase "UC-06 Áp mã giảm giá\n(FR-06)" as UC06
+  usecase "UC-07 Thử lại thanh toán\n(FR-07)" as UC07
+  usecase "Cộng điểm thưởng\n(FR-12)" as Points
+}
+
+Customer --> UC05
+UC05 ..> UC04 : <<include>>
+UC05 ..> Create : <<include>>
+UC05 ..> Pay : <<include>>
+UC05 ..> Confirm : <<include>>
+UC06 ..> Create : <<extend>>\n[khách nhập mã]
+UC07 ..> Pay : <<extend>>\n[lần trước PAYMENT_FAILED]
+Points ..> Pay : <<extend>>\n[đơn → PAID]
+Pay --> PG
+note right of Pay
+  Bắt buộc header Idempotency-Key.
+  Gửi lặp cùng key → trả kết quả cũ,
+  không trừ tiền lần hai.
+end note
+@enduml

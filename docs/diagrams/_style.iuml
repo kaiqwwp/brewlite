@@ -1,0 +1,10 @@
+' Kiểu dùng chung cho mọi sơ đồ BrewLite
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam ArrowColor #573520
+skinparam ArrowFontSize 11
+skinparam BackgroundColor #FFFFFF
+skinparam NoteBackgroundColor #FFF8E7
+skinparam NoteBorderColor #C9A66B
