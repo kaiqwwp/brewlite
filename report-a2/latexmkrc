@@ -1,0 +1,2 @@
+# Overleaf: biên dịch bằng XeLaTeX
+$pdf_mode = 5;

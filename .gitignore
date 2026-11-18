@@ -19,3 +19,12 @@ report/*.fdb_latexmk
 # Playwright
 playwright-report/
 test-results/
+
+# LaTeX Assignment 2
+report-a2/*.aux
+report-a2/*.log
+report-a2/*.out
+report-a2/*.toc
+report-a2/*.xdv
+report-a2/*.fls
+report-a2/*.fdb_latexmk
