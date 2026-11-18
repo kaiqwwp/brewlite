@@ -1,0 +1,137 @@
+# CI: chạy khi mở/cập nhật pull request vào main, và được pipeline CD gọi lại làm quality gate.
+# Install → Lint → Unit Test → Build cho từng app; thêm integration test (PostgreSQL thật),
+# E2E (Playwright) và quét secret. Đặt các job này là "required status checks" của nhánh main
+# để PR không merge được khi một bước thất bại (xem docs/deployment.md, mục Bảo vệ nhánh).
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: ${{ matrix.app }} · install, lint, unit test, build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [api, web]
+    defaults:
+      run:
+        working-directory: apps/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/${{ matrix.app }}/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Unit test
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  integration:
+    name: api · integration test (PostgreSQL)
+    runs-on: ubuntu-latest
+    needs: quality
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: brewlite_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: apps/api
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/brewlite_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+      - run: npm ci
+      - name: Integration test (tạo đơn, thanh toán, tồn kho, migration, health)
+        run: npm run test:e2e
+
+  e2e:
+    name: e2e · menu → xác nhận đơn (Playwright)
+    runs-on: ubuntu-latest
+    needs: quality
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: brewlite
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/brewlite
+      JWT_SECRET: ci-only-secret-0123456789abcdef0123456789
+      CORS_ORIGIN: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      E2E_BASE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/api/package-lock.json
+            apps/web/package-lock.json
+      - name: Install
+        run: npm run install:all
+      - name: Build
+        run: npm run build
+      - name: Start API (migration + seed) và web
+        run: |
+          (cd apps/api && nohup node dist/main.js > ../../api.log 2>&1 &)
+          (cd apps/web && nohup npx next start -p 3000 > ../../web.log 2>&1 &)
+          npx --yes wait-on@8.0.1 -t 90000 http://localhost:3001/health http://localhost:3000
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: E2E test
+        run: npm run test:e2e
+      - name: Upload report and logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: |
+            playwright-report/
+            test-results/
+            api.log
+            web.log
+
+  secrets:
+    name: quét secret (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

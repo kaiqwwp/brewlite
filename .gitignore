@@ -15,3 +15,7 @@ report/*.toc
 report/*.xdv
 report/*.fls
 report/*.fdb_latexmk
+
+# Playwright
+playwright-report/
+test-results/

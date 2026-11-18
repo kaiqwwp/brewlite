@@ -1,0 +1,23 @@
+name: Lỗi
+description: Báo lỗi phát hiện khi kiểm thử hoặc trên production
+labels: ["bug"]
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: Các bước tái hiện
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes:
+      label: Kết quả mong đợi / thực tế
+    validations: { required: true }
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Mức độ
+      options: [Cao, Trung bình, Thấp]
+  - type: input
+    id: version
+    attributes:
+      label: Phiên bản (commit SHA từ /health)

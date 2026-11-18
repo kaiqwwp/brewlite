@@ -1,0 +1,30 @@
+name: User story
+description: Một hạng mục của Product Backlog
+labels: ["user-story"]
+body:
+  - type: input
+    id: story
+    attributes:
+      label: User story
+      placeholder: Là khách hàng, tôi muốn ... để ...
+    validations: { required: true }
+  - type: input
+    id: req
+    attributes:
+      label: Mã yêu cầu
+      placeholder: FR-03, NFR-02
+  - type: textarea
+    id: ac
+    attributes:
+      label: Tiêu chí chấp nhận
+      description: Mỗi dòng một tiêu chí kiểm chứng được (Given/When/Then)
+    validations: { required: true }
+  - type: dropdown
+    id: priority
+    attributes:
+      label: MoSCoW
+      options: [Must, Should, Could, "Won't"]
+  - type: input
+    id: sp
+    attributes:
+      label: Story point

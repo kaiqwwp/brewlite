@@ -2,7 +2,6 @@ import { BadRequestException, ConflictException, Injectable } from '@nestjs/comm
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { isUniqueViolation } from '../common/db-errors';
-import { Order } from '../entities/order.entity';
 import { Payment } from '../entities/payment.entity';
 import { OrderStatus } from '../orders/order-status';
 import { OrdersService } from '../orders/orders.service';
