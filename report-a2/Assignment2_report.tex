@@ -740,10 +740,10 @@ Workflow \st{.github/workflows/cd.yml} chạy khi push vào \st{main}, khi đẩ
 
 Smoke test được thử trên máy local với API chạy \st{NODE\_ENV=production}: đúng phiên bản thì đạt cả năm kiểm tra; truyền sai phiên bản mong đợi thì báo ``đang chạy local-test, chờ wrongsha'' và thoát mã 1, đây là tín hiệu kích hoạt rollback.
 
-\evidenceimg{cd-success.png}{Lần chạy CD thành công trên \st{main}: sơ đồ job và Summary ``Production đang chạy <SHA>''.}
+\evidenceimg{cd-success.png}{Lần chạy CD thành công trên \st{main} sau khi merge PR \#13: sơ đồ job và Summary ``Production đang chạy 261da37...''.}
 Link: \url{https://github.com/kaiqwwp/brewlite/actions/workflows/cd.yml?query=branch:main+is:success}
 
-\evidenceimg{rollback.png}{Lần rollback: chạy CD với \st{rollback\_to} = SHA cũ, \st{/health} trả về SHA cũ.}
+\evidenceimg{rollback.png}{Rollback: chạy CD với \st{rollback\_to} = \st{1aade28}; \st{/health} trả về SHA cũ \st{1aade28}, sau đó triển khai lại bản \st{v2.0.0} (\st{261da37}).}
 Link: \url{https://github.com/kaiqwwp/brewlite/actions/workflows/cd.yml?query=event:workflow_dispatch}
 
 
