@@ -15,3 +15,4 @@ async function bootstrap() {
   new Logger('Bootstrap').log(`BrewLite API ${appVersion()} đang chạy tại cổng ${port}`);
 }
 bootstrap();
+const unused = 1;
