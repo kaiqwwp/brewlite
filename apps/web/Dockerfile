@@ -1,5 +1,6 @@
+# Dùng Debian slim (glibc): package-lock không ghi libc nên trên Alpine npm cài nhầm SWC bản gnu.
 # ---- build ----
-FROM node:22-alpine AS build
+FROM node:22-bookworm-slim AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -10,7 +11,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # ---- run ----
-FROM node:22-alpine
+FROM node:22-bookworm-slim
 ARG GIT_SHA=dev
 ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0 APP_VERSION=$GIT_SHA NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
