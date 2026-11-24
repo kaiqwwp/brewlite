@@ -16,7 +16,7 @@ Tài liệu này là runbook cho Task 4.4, 5.3 và 5.4. Sơ đồ: [Deploy-01](d
 Pull request ──► CI (ci.yml): Install → Lint → Unit Test → Build  (api, web)
                                └► Integration test (PostgreSQL) ─► E2E (Playwright) ; gitleaks
 Merge vào main / push tag vX.Y.Z ──► CD (cd.yml):
-  quality gate (gọi lại ci.yml) → build image → push ghcr.io/<user>/brewlite-{api,web}:<SHA>
+  quality gate (gọi lại ci.yml) → build image → push ghcr.io/kaiqwwp/brewlite-{api,web}:<SHA>
   → deploy hook API (migration chạy khi khởi động) → chờ /health = SHA → deploy hook web
   → smoke test → (lỗi) rollback về SHA trước → dừng pipeline với lỗi
   → (tag) tạo GitHub Release từ docs/releases/<tag>.md
@@ -35,7 +35,7 @@ Merge vào main / push tag vX.Y.Z ──► CD (cd.yml):
 ## 2. Thiết lập lần đầu (làm một lần, khoảng 30 phút)
 
 ### 2.1 GitHub
-1. Tạo repository `brewlite` (public, hoặc private và mời giảng viên với quyền Read). Đẩy mã: `git remote add origin https://github.com/<user>/brewlite.git && git push -u origin main --tags`.
+1. Tạo repository `brewlite` (public, hoặc private và mời giảng viên với quyền Read). Đẩy mã: `git remote add origin https://github.com/kaiqwwp/brewlite.git && git push -u origin main --tags`.
 2. **Settings → Actions → General → Workflow permissions**: chọn *Read and write permissions* (để push GHCR và tạo release).
 3. **Settings → Environments → New environment** `production` → *Environment secrets*: `RENDER_DEPLOY_HOOK_API`, `RENDER_DEPLOY_HOOK_WEB` (lấy ở bước 2.2.4).
 4. **Settings → Secrets and variables → Actions → Variables** (cấp repository, vì job build image web cũng cần): `API_URL` = `https://brewlite-api.onrender.com`, `WEB_URL` = `https://brewlite-web.onrender.com` (không có dấu `/` cuối). `API_URL` được nhúng vào image web lúc build.
@@ -44,7 +44,7 @@ Merge vào main / push tag vX.Y.Z ──► CD (cd.yml):
 
 ### 2.2 Render
 1. Đăng ký https://render.com bằng tài khoản GitHub.
-2. Sửa `render.yaml`: thay `<github-user>` bằng tên tài khoản GitHub viết thường; commit qua PR.
+2. `render.yaml` đã trỏ tới image `ghcr.io/kaiqwwp/...`; nếu đổi tài khoản GitHub thì sửa lại tên này.
 3. **New → Blueprint** → chọn repo → Render tạo `brewlite-db`, `brewlite-api`, `brewlite-web`. Nhập các biến `sync: false`:
    - `CORS_ORIGIN` = URL web (ví dụ `https://brewlite-web.onrender.com`)
    - `STAFF_PASSWORD` = mật khẩu tài khoản nhân viên mẫu (không dùng `staff123`)

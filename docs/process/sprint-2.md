@@ -17,7 +17,7 @@
 
 | Thông tin bàn giao | Giá trị |
 |---|---|
-| Repository | *https://github.com/<user>/brewlite* |
+| Repository | https://github.com/kaiqwwp/brewlite |
 | Web production | *https://….onrender.com* |
 | API production | *https://….onrender.com* · health: */health* |
 | PR có CI thành công | *link* |

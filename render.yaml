@@ -1,7 +1,7 @@
 # Render Blueprint – hạ tầng production của BrewLite (Infrastructure as Code).
 # Tạo một lần: Render Dashboard → New → Blueprint → chọn repo này. Sau đó pipeline CD
 # (.github/workflows/cd.yml) triển khai từng phiên bản bằng deploy hook + image trên GHCR.
-# Thay <github-user> bằng tên tài khoản GitHub (chữ thường) trước khi tạo Blueprint.
+# Image lấy từ GHCR của tài khoản GitHub kaiqwwp.
 databases:
   - name: brewlite-db
     databaseName: brewlite
@@ -16,7 +16,7 @@ services:
     name: brewlite-api
     runtime: image
     image:
-      url: ghcr.io/<github-user>/brewlite-api:latest
+      url: ghcr.io/kaiqwwp/brewlite-api:latest
     plan: free
     region: singapore
     healthCheckPath: /health
@@ -43,7 +43,7 @@ services:
     name: brewlite-web
     runtime: image
     image:
-      url: ghcr.io/<github-user>/brewlite-web:latest
+      url: ghcr.io/kaiqwwp/brewlite-web:latest
     plan: free
     region: singapore
     healthCheckPath: /health

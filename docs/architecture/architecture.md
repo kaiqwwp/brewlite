@@ -12,8 +12,8 @@ Kiến trúc được mô tả theo **mô hình C4** (mức 1 Context, mức 2 C
 
 | Container | Công nghệ | Thư mục mã nguồn | Triển khai production | Trách nhiệm |
 |---|---|---|---|---|
-| Web app | Next.js 14 (App Router), React 18, TypeScript, Tailwind, Zustand | `apps/web` | Render Web Service `brewlite-web` (image `ghcr.io/<user>/brewlite-web:<sha>`) | Giao diện mobile-first, PWA, giỏ hàng phía client, gọi REST API |
-| REST API | NestJS 10, TypeORM 0.3, Passport JWT, class-validator | `apps/api` | Render Web Service `brewlite-api` (image `ghcr.io/<user>/brewlite-api:<sha>`) | Nghiệp vụ, xác thực, phân quyền, transaction, migration, health check |
+| Web app | Next.js 14 (App Router), React 18, TypeScript, Tailwind, Zustand | `apps/web` | Render Web Service `brewlite-web` (image `ghcr.io/kaiqwwp/brewlite-web:<sha>`) | Giao diện mobile-first, PWA, giỏ hàng phía client, gọi REST API |
+| REST API | NestJS 10, TypeORM 0.3, Passport JWT, class-validator | `apps/api` | Render Web Service `brewlite-api` (image `ghcr.io/kaiqwwp/brewlite-api:<sha>`) | Nghiệp vụ, xác thực, phân quyền, transaction, migration, health check |
 | CSDL | PostgreSQL 16 | `apps/api/src/database` (migration) | Render PostgreSQL `brewlite-db`, chỉ truy cập qua Internal URL | Lưu dữ liệu, ràng buộc toàn vẹn (UNIQUE, CHECK, FK) |
 | Payment adapter | `MockPaymentGateway` (provider NestJS) | `apps/api/src/payments/mock-gateway.ts` | Chạy trong tiến trình API | Mô phỏng cổng Ví/Thẻ qua interface `charge()`, thay bằng adapter thật không phải sửa nghiệp vụ |
 

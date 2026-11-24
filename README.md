@@ -38,7 +38,7 @@ Bài tập lớn môn **Công nghệ Phần mềm**, ĐH Sài Gòn, HK I 2026–
 Yêu cầu: Docker Desktop (hoặc Docker Engine + Compose v2).
 
 ```bash
-git clone https://github.com/<user>/brewlite.git && cd brewlite
+git clone https://github.com/kaiqwwp/brewlite.git && cd brewlite
 docker compose up --build
 ```
 

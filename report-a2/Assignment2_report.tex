@@ -161,7 +161,7 @@ Ba thành phần bắt buộc được giữ nguyên: Next.js (mobile-first/PWA)
 \begin{center}
 \begin{tabular}{|L{4.2cm}|L{10.8cm}|}
 \hline
-Repository & \TODO{https://github.com/<user>/brewlite} \\ \hline
+Repository & \url{https://github.com/kaiqwwp/brewlite} \\ \hline
 Web production (HTTPS) & \TODO{https://brewlite-web.onrender.com} \\ \hline
 API production & \TODO{https://brewlite-api.onrender.com} -- health check: \st{/health} \\ \hline
 Phiên bản & \st{v2.0.0} (release notes: \st{docs/releases/v2.0.0.md}) \\ \hline
@@ -724,7 +724,7 @@ Workflow \st{.github/workflows/cd.yml} chạy khi push vào \st{main}, khi đẩ
 \textbf{Yêu cầu của đề} & \textbf{Cách thực hiện} \\ \hline
 \endhead
 1. Quality gate lint, test, build & Job \st{quality-gate} gọi lại \st{ci.yml} (\st{workflow\_call}); job sau chỉ chạy khi gate xanh \\ \hline
-2. Image tag commit SHA hoặc semver & \st{docker/metadata-action}: \st{type=sha,format=long} (\st{ghcr.io/<user>/brewlite-api:<sha>}), \st{type=semver} khi đẩy tag, \st{latest} cho \st{main} \\ \hline
+2. Image tag commit SHA hoặc semver & \st{docker/metadata-action}: \st{type=sha,format=long} (\st{ghcr.io/kaiqwwp/brewlite-api:<sha>}), \st{type=semver} khi đẩy tag, \st{latest} cho \st{main} \\ \hline
 3. Push lên container registry & \st{docker/build-push-action} đẩy lên GHCR, đăng nhập bằng \st{GITHUB\_TOKEN}; image chứa \st{APP\_VERSION=<sha>} \\ \hline
 4. Triển khai bằng secret của CI & \st{RENDER\_DEPLOY\_HOOK\_API}, \st{RENDER\_DEPLOY\_HOOK\_WEB} là secret của environment \st{production}; gọi hook kèm \st{imgURL=<image:sha>}; GitHub che giá trị secret trong log \\ \hline
 5. Chạy migration an toàn & Migration chạy khi container API mới khởi động, trong một transaction; lỗi thì container dừng, Render không chuyển traffic khỏi bản cũ (ADR-004). Quy tắc migration tương thích ngược để rollback image an toàn \\ \hline
@@ -830,7 +830,7 @@ Giao diện barista và thông báo thời gian thực khi đơn \st{READY}; c�
 \hline
 \textbf{Mục} & \textbf{Trạng thái} & \textbf{Vị trí} \\ \hline
 \endhead
-Link repository và quyền truy cập cho giảng viên & \TODO{ } & \TODO{link}; repo public hoặc mời giảng viên quyền Read \\ \hline
+Link repository và quyền truy cập cho giảng viên & \TODO{ } & \url{https://github.com/kaiqwwp/brewlite}; repo public hoặc mời giảng viên quyền Read \\ \hline
 SRS, đặc tả use-case, ma trận truy vết & \checkmark & \st{docs/requirements/}, \st{docs/traceability-matrix.md} \\ \hline
 Activity, sequence, class, deployment diagram & \checkmark & \st{docs/diagrams/} (\st{.puml} + \st{.svg}) \\ \hline
 Source code frontend, backend, migration & \checkmark & \st{apps/web}, \st{apps/api}, \st{apps/api/src/database/migrations} \\ \hline
@@ -845,7 +845,7 @@ Video/demo và Sprint Retrospective & \TODO{ } & \TODO{link video}; \st{docs/pro
 \section{Hướng dẫn chạy nhanh}
 \begin{Verbatim}[fontsize=\footnotesize,frame=lines,framesep=2mm]
 # Local bằng Docker
-git clone https://github.com/<user>/brewlite.git && cd brewlite
+git clone https://github.com/kaiqwwp/brewlite.git && cd brewlite
 docker compose up --build          # web :3000, API :3001, /health
 # Kiểm thử
 npm run install:all && npm run lint && npm test
