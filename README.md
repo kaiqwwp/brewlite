@@ -6,8 +6,8 @@ Bài tập lớn môn **Công nghệ Phần mềm**, ĐH Sài Gòn, HK I 2026–
 
 | | |
 |---|---|
-| Web production | *https://brewlite-web.onrender.com* (điền URL thật sau khi triển khai) |
-| API production | *https://brewlite-api.onrender.com* · health check: `/health` |
+| Web production | https://brewlite-web-ed96.onrender.com |
+| API production | https://brewlite-api-9uli.onrender.com · health check: https://brewlite-api-9uli.onrender.com/health |
 | Phiên bản | 2.0.0 (Assignment 2) – [release notes](docs/releases/v2.0.0.md) · [CHANGELOG](CHANGELOG.md) |
 
 ## Công nghệ

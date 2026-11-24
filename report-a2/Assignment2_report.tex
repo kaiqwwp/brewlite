@@ -162,8 +162,8 @@ Ba thành phần bắt buộc được giữ nguyên: Next.js (mobile-first/PWA)
 \begin{tabular}{|L{4.2cm}|L{10.8cm}|}
 \hline
 Repository & \url{https://github.com/kaiqwwp/brewlite} \\ \hline
-Web production (HTTPS) & \TODO{https://brewlite-web.onrender.com} \\ \hline
-API production & \TODO{https://brewlite-api.onrender.com} -- health check: \st{/health} \\ \hline
+Web production (HTTPS) & \url{https://brewlite-web-ed96.onrender.com} \\ \hline
+API production & \url{https://brewlite-api-9uli.onrender.com} -- health check: \st{/health} \\ \hline
 Phiên bản & \st{v2.0.0} (release notes: \st{docs/releases/v2.0.0.md}) \\ \hline
 Video demo & \TODO{link video} \\ \hline
 Tài khoản nhân viên mẫu & \st{staff@brewlite.local} / mật khẩu đặt trong biến \st{STAFF\_PASSWORD} trên Render \\ \hline
@@ -743,8 +743,8 @@ Smoke test được thử trên máy local với API chạy \st{NODE\_ENV=produc
 \hline
 \textbf{Yêu cầu bàn giao} & \textbf{Kết quả} \\ \hline
 \endhead
-URL frontend production qua HTTPS & \TODO{https://brewlite-web.onrender.com} \\ \hline
-URL API và health check & \TODO{https://brewlite-api.onrender.com/health} \\ \hline
+URL frontend production qua HTTPS & \url{https://brewlite-web-ed96.onrender.com} \\ \hline
+URL API và health check & \url{https://brewlite-api-9uli.onrender.com/health} \\ \hline
 CSDL production không public & Render PostgreSQL với \st{ipAllowList: []}; API dùng Internal URL qua \st{fromDatabase} trong \st{render.yaml} \\ \hline
 Secret không có trong repo/log & \st{.env} bị bỏ qua; \st{JWT\_SECRET} do Render sinh (\st{generateValue}); deploy hook là secret GitHub; gitleaks quét lịch sử git: không phát hiện secret \\ \hline
 Release/tag và release notes & Tag \st{v1.0.0} (Assignment 1); tag \st{v2.0.0} kích hoạt CD và job \st{release} tạo GitHub Release từ \st{docs/releases/v2.0.0.md}; \st{CHANGELOG.md} \\ \hline

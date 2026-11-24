@@ -6,7 +6,7 @@ Tài liệu này là runbook cho Task 4.4, 5.3 và 5.4. Sơ đồ: [Deploy-01](d
 |---|---|---|---|
 | Local | http://localhost:3000 | http://localhost:3001 (`/health`) | localhost:5432 (Docker volume `brewlite-db`) |
 | CI | runner GitHub, `next start` | runner GitHub, `node dist/main.js` | service container `postgres:16-alpine` |
-| Production | `https://brewlite-web.onrender.com` *(điền URL thật)* | `https://brewlite-api.onrender.com` *(điền URL thật)*, `/health` | Render PostgreSQL `brewlite-db`, chỉ Internal URL |
+| Production | `https://brewlite-web-ed96.onrender.com` | `https://brewlite-api-9uli.onrender.com`, `/health` | Render PostgreSQL `brewlite-db`, chỉ Internal URL |
 
 ![Deploy-01](diagrams/deployment-production.svg)
 
@@ -38,7 +38,7 @@ Merge vào main / push tag vX.Y.Z ──► CD (cd.yml):
 1. Tạo repository `brewlite` (public, hoặc private và mời giảng viên với quyền Read). Đẩy mã: `git remote add origin https://github.com/kaiqwwp/brewlite.git && git push -u origin main --tags`.
 2. **Settings → Actions → General → Workflow permissions**: chọn *Read and write permissions* (để push GHCR và tạo release).
 3. **Settings → Environments → New environment** `production` → *Environment secrets*: `RENDER_DEPLOY_HOOK_API`, `RENDER_DEPLOY_HOOK_WEB` (lấy ở bước 2.2.4).
-4. **Settings → Secrets and variables → Actions → Variables** (cấp repository, vì job build image web cũng cần): `API_URL` = `https://brewlite-api.onrender.com`, `WEB_URL` = `https://brewlite-web.onrender.com` (không có dấu `/` cuối). `API_URL` được nhúng vào image web lúc build.
+4. **Settings → Secrets and variables → Actions → Variables** (cấp repository, vì job build image web cũng cần): `API_URL` = `https://brewlite-api-9uli.onrender.com`, `WEB_URL` = `https://brewlite-web-ed96.onrender.com` (không có dấu `/` cuối). `API_URL` được nhúng vào image web lúc build.
 5. **Bảo vệ nhánh** – Settings → Branches → Add rule cho `main`: *Require a pull request before merging*; *Require status checks to pass*: chọn `api · install, lint, unit test, build`, `web · install, lint, unit test, build`, `api · integration test (PostgreSQL)`, `e2e · menu → xác nhận đơn (Playwright)`, `quét secret (gitleaks)`; *Require branches to be up to date*. (Các check chỉ hiện trong danh sách sau khi CI chạy ít nhất một lần.)
 6. Chạy lần đầu để có image: Actions → CD → *Run workflow* (để trống `rollback_to`). Job `deploy` sẽ thất bại ở bước kiểm tra cấu hình nếu chưa có hook — bình thường. Sau đó vào **Packages** → `brewlite-api` và `brewlite-web` → *Package settings* → *Change visibility* → **Public**.
 
@@ -46,7 +46,7 @@ Merge vào main / push tag vX.Y.Z ──► CD (cd.yml):
 1. Đăng ký https://render.com bằng tài khoản GitHub.
 2. `render.yaml` đã trỏ tới image `ghcr.io/kaiqwwp/...`; nếu đổi tài khoản GitHub thì sửa lại tên này.
 3. **New → Blueprint** → chọn repo → Render tạo `brewlite-db`, `brewlite-api`, `brewlite-web`. Nhập các biến `sync: false`:
-   - `CORS_ORIGIN` = URL web (ví dụ `https://brewlite-web.onrender.com`)
+   - `CORS_ORIGIN` = URL web (`https://brewlite-web-ed96.onrender.com`)
    - `STAFF_PASSWORD` = mật khẩu tài khoản nhân viên mẫu (không dùng `staff123`)
 4. Mỗi dịch vụ → **Settings → Deploy Hook** → copy URL vào secret GitHub tương ứng (bước 2.1.3). Nếu URL dịch vụ khác tên mặc định, cập nhật `API_URL`, `WEB_URL`, `CORS_ORIGIN`.
 5. Kiểm tra `brewlite-db` → **Networking / Access Control**: danh sách IP trống (không cho kết nối ngoài). API dùng **Internal Database URL** (Blueprint đã gắn sẵn qua `fromDatabase`).

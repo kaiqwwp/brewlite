@@ -5,7 +5,7 @@
 - Liên quan: FR-04, NFR-03, NFR-05
 
 ## Bối cảnh
-Web và API chạy ở hai origin khác nhau trên Render (`brewlite-web.onrender.com`, `brewlite-api.onrender.com`). Cần xác thực không trạng thái, đơn giản.
+Web và API chạy ở hai origin khác nhau trên Render (`brewlite-web-ed96.onrender.com`, `brewlite-api-9uli.onrender.com`). Cần xác thực không trạng thái, đơn giản.
 
 ## Quyết định
 - Mật khẩu băm bcrypt cost 10. Đăng nhập trả JWT HS256 ký bằng `JWT_SECRET` (≥ 32 ký tự ở production, sinh ngẫu nhiên bởi Render), hết hạn 1 ngày (`JWT_EXPIRES_IN`).

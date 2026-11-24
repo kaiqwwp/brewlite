@@ -18,8 +18,8 @@
 | Thông tin bàn giao | Giá trị |
 |---|---|
 | Repository | https://github.com/kaiqwwp/brewlite |
-| Web production | *https://….onrender.com* |
-| API production | *https://….onrender.com* · health: */health* |
+| Web production | https://brewlite-web-ed96.onrender.com |
+| API production | https://brewlite-api-9uli.onrender.com · health: https://brewlite-api-9uli.onrender.com/health |
 | PR có CI thành công | *link* |
 | PR có CI thất bại (lint) | *link* |
 | Lần chạy CD thành công | *link* |
