@@ -2,7 +2,7 @@
 
 Video demo end-to-end trên bản production (https://brewlite-web-ed96.onrender.com):
 
-**Link video:** DÁN_LINK_VIDEO_VÀO_ĐÂY
+**Link video:** (đang cập nhật)
 
 Nội dung (khoảng 4 phút):
 1. Mở Menu trên khung điện thoại, xem chi tiết đồ uống, chọn size và topping.
