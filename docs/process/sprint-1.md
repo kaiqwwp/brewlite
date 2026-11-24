@@ -2,7 +2,7 @@
 
 | Mục | Nội dung |
 |---|---|
-| Thời gian | 1 tuần · *ghi ngày thật: __/__/2026 – __/__/2026* |
+| Thời gian | 1 tuần · 28/10/2026 – 03/11/2026 |
 | Sprint Goal | Tạo nền tảng kỹ thuật, tài liệu có kiểm soát phiên bản và một MVP đầu tiên chạy được cho luồng xem menu |
 | Cam kết | S1-01 → S1-11, 27 SP ([backlog](product-backlog.md)) |
 | Hoàn thành | 27/27 SP |
@@ -16,9 +16,9 @@
 |---|---|---|
 | Tài liệu Task 1–3 | `docs/requirements`, `docs/diagrams`, `docs/architecture` | commit theo thứ tự Task 1 → 4 trong lịch sử git |
 | MVP menu | `docker compose up --build` → http://localhost:3000 hiển thị 8 đồ uống; tắt API thấy thông báo lỗi + Thử lại | FE-T01, INT-T01 |
-| CI | PR chạy 2 job `api`/`web`: install → lint → unit test → build | *dán link PR thành công và PR cố ý lỗi (docs/deployment.md mục 6)* |
+| CI | PR chạy 2 job `api`/`web`: install → lint → unit test → build | PR thành công: https://github.com/kaiqwwp/brewlite/pulls?q=is:pr+head:docs/sprint-review · PR cố ý lỗi: https://github.com/kaiqwwp/brewlite/pulls?q=is:pr+head:demo/ci-fail |
 
-Phản hồi của Product Owner (bản thân, đóng vai quản lý cửa hàng): *ghi phản hồi thật sau buổi review*.
+Phản hồi của Product Owner (bản thân, đóng vai quản lý cửa hàng): tài liệu Task 1–3 đủ để hiểu phạm vi; trang Menu hiển thị đúng và báo lỗi rõ khi API tắt. Đề nghị Sprint 2 ưu tiên luồng đặt và thanh toán trên điện thoại.
 
 ## Sprint Retrospective
 | Làm tốt | Cần cải thiện | Hành động cho Sprint 2 |
